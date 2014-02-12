@@ -6,7 +6,7 @@ default: Worker.class KKMultiServerThread.class KKMultiServer.class
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
 
-ServerThread.class: KKMultiServerThread.java
+KKMultiServerThread.class: KKMultiServerThread.java
 	$(JCC) $(JFLAGS) KKMultiServerThread.java
 
 KKMultiServer.class: KKMultiServer.java

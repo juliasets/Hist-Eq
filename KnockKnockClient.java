@@ -31,51 +31,80 @@
 
 import java.io.*;
 import java.net.*;
+import org.apache.commons.imaging.*;
+import java.util.*;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
+import org.apache.commons.imaging.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class KnockKnockClient {
     public static void main(String[] args) throws IOException {
         
-        if (args.length != 4) {
+        if (args.length != 3) {
             System.err.println(
-                "Usage: java EchoClient <host name> <port number> <image filename> <output filename>");
+                "Usage: java EchoClient <host name> <port number> <directory>");
             System.exit(1);
         }
 
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
-        String filename = args[2];
-        String outfilename = args[3];
-
+        File dir = new File(args[2]);
+        ArrayList<String> names = new ArrayList<String>(Arrays.asList(dir.list()));
+        
+        ArrayList<String> inputFilenames = new ArrayList<String>();
+        //ArrayList<String> outputFilenames = new ArrayList<String>();
+        
+        for (int i = 0; i < names.size(); i++)
+        {
+        	if (names.get(i).endsWith(".jpg") ||
+        		names.get(i).endsWith(".JPG") ||
+        		names.get(i).endsWith(".png") ||
+        		names.get(i).endsWith(".png"))
+        	{
+        		inputFilenames.add(names.get(i));
+        		//outputFilenames.add("processed-" + names.get(i));
+        	}
+        }
+        
         try (
             Socket kkSocket = new Socket(hostName, portNumber);
-            PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(
-                new InputStreamReader(kkSocket.getInputStream()));
+            //PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
+            //BufferedReader in = new BufferedReader(
+            //    new InputStreamReader(kkSocket.getInputStream()));
         ) {
-            BufferedReader stdIn =
-                new BufferedReader(new InputStreamReader(System.in));
-            String fromServer;
-            String fromUser;
+            //Create object with socket
+            //skt
             
-            File f = new File(filename);
-            BufferedImage im = getBufferedImage(f);
-            
-            String encodedIm;
-            //encode image
-            
-            out.println(encodedIm);//send image
+            for (int i = 0; i < inputFilenames.size(); i++)
+            {
+		        File f = new File(inputFilenames.get(i));
+		        BufferedImage im = Imaging.getBufferedImage(f);
+		        
+		        ImageComm ic = new ImageComm(kkSocket);
+		        
+		        ic.sndimg(im);//send image
 
-            while ((fromServer = in.readLine()) != null) {
-                /*System.out.println("Server: " + fromServer);
-                if (fromServer.equals("Bye."))
-                    break;
-                
-                fromUser = stdIn.readLine();
-                if (fromUser != null) {
-                    System.out.println("Client: " + fromUser);
-                    out.println(fromUser);
-                }*/
-                
+		        /*while ((fromServer = in.readLine()) != null) {
+		            System.out.println("Server: " + fromServer);
+		            if (fromServer.equals("Bye."))
+		                break;
+		            
+		            fromUser = stdIn.readLine();
+		            if (fromUser != null) {
+		                System.out.println("Client: " + fromUser);
+		                out.println(fromUser);
+		            }
+		            
+		        }*/
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

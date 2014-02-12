@@ -47,7 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KnockKnockClient {
-    public static void main(String[] args) throws IOException, ImageReadException {
+    public static void main(String[] args) throws IOException, ImageReadException, ImageWriteException {
         
         if (args.length != 3) {
             System.err.println(
@@ -113,6 +113,6 @@ public class KnockKnockClient {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
             System.exit(1);
-        }
+        } 
     }
 }

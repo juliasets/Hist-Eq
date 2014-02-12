@@ -18,7 +18,7 @@ KnockKnockServer.class: KnockKnockServer.java
 KnockKnockProtocol.class: KnockKnockProtocol.java
 	$(JCC) $(JFLAGS) KnockKnockProtocol.java
 
-KnockKnockClient.class: KnockKnockClient.java commons-imaging.jar
+KnockKnockClient.class: KnockKnockClient.java ImageComm.class commons-imaging.jar
 	$(JCC) $(JFLAGS) -cp commons-imaging.jar KnockKnockClient.java
 
 ImageComm.class: ImageComm.java commons-imaging.jar

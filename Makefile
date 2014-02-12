@@ -1,5 +1,11 @@
 JCC = javac
-JFLAGS = -g
+
+CLASSPATH = $(shell echo .:commons-imaging.jar)
+ifeq ($(shell uname -o),Cygwin)
+        CLASSPATH = $(shell cygpath -wp $(CLASSPATH))
+endif
+
+JFLAGS = -g -cp $(CLASSPATH)
 
 default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockServer.class KnockKnockProtocol.class KnockKnockClient.class ImageComm.class
 
@@ -19,10 +25,10 @@ KnockKnockProtocol.class: KnockKnockProtocol.java
 	$(JCC) $(JFLAGS) KnockKnockProtocol.java
 
 KnockKnockClient.class: KnockKnockClient.java ImageComm.class commons-imaging.jar
-	$(JCC) $(JFLAGS) -cp .:commons-imaging.jar KnockKnockClient.java
+	$(JCC) $(JFLAGS) KnockKnockClient.java
 
 ImageComm.class: ImageComm.java commons-imaging.jar
-	$(JCC) $(JFLAGS) -cp .:commons-imaging.jar ImageComm.java
+	$(JCC) $(JFLAGS) ImageComm.java
 	
 ProcessorAccessList.class: ProcessorAccessList.java
 	$(JCC) $(JFLAGS) ProcessorAccessList.java

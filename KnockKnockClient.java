@@ -35,14 +35,16 @@ import java.net.*;
 public class KnockKnockClient {
     public static void main(String[] args) throws IOException {
         
-        if (args.length != 2) {
+        if (args.length != 4) {
             System.err.println(
-                "Usage: java EchoClient <host name> <port number>");
+                "Usage: java EchoClient <host name> <port number> <image filename> <output filename>");
             System.exit(1);
         }
 
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
+        String filename = args[2];
+        String outfilename = args[3];
 
         try (
             Socket kkSocket = new Socket(hostName, portNumber);
@@ -54,9 +56,17 @@ public class KnockKnockClient {
                 new BufferedReader(new InputStreamReader(System.in));
             String fromServer;
             String fromUser;
+            
+            File f = new File(filename);
+            BufferedImage im = getBufferedImage(f);
+            
+            String encodedIm;
+            //encode image
+            
+            out.println(encodedIm);//send image
 
             while ((fromServer = in.readLine()) != null) {
-                System.out.println("Server: " + fromServer);
+                /*System.out.println("Server: " + fromServer);
                 if (fromServer.equals("Bye."))
                     break;
                 
@@ -64,7 +74,8 @@ public class KnockKnockClient {
                 if (fromUser != null) {
                     System.out.println("Client: " + fromUser);
                     out.println(fromUser);
-                }
+                }*/
+                
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

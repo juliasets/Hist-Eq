@@ -1,8 +1,8 @@
 JCC = javac
 
-CLASSPATH = $(shell echo .:commons-imaging.jar)
+CLASSPATH = .:commons-imaging.jar
 ifeq ($(shell uname -o),Cygwin)
-        CLASSPATH := $(shell cygpath -wp $(CLASSPATH))
+        CLASSPATH := "$(shell cygpath -wp $(CLASSPATH))"
 endif
 
 JFLAGS = -g -cp $(CLASSPATH)

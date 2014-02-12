@@ -1,16 +1,16 @@
 JCC = javac
 JFLAGS = -g
 
-default: Worker.class ServerThread.class MultiServer.class
+default: Worker.class KKKKMultiServerThread.class KKMultiServer.class
 
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
 
-ServerThread.class: serverThread.java
-	$(JCC) $(JFLAGS) serverThread.java
+ServerThread.class: KKKKMultiServerThread.java
+	$(JCC) $(JFLAGS) KKKKMultiServerThread.java
 
-MultiServer.class: multiServer.java
-	$(JCC) $(JFLAGS) multiServer.java
+KKMultiServer.class: KKMultiServer.java
+	$(JCC) $(JFLAGS) KKMultiServer.java
 
 clean: 
 	$(RM) *.class

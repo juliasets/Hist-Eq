@@ -30,8 +30,9 @@ public class ImageComm {
 		
 	}
 
-	public BufferedImage recvimg () {
-		
+	public BufferedImage recvimg () throws IOException, ImageReadException {
+		return Imaging.getBufferedImage(
+				DatatypeConverter.parseBase64Binary(in.readLine()));
 	}
 
 }

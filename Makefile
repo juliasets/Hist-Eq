@@ -19,10 +19,10 @@ KnockKnockProtocol.class: KnockKnockProtocol.java
 	$(JCC) $(JFLAGS) KnockKnockProtocol.java
 
 KnockKnockClient.class: KnockKnockClient.java ImageComm.class commons-imaging.jar
-	$(JCC) $(JFLAGS) -cp commons-imaging.jar KnockKnockClient.java
+	$(JCC) $(JFLAGS) -cp .:commons-imaging.jar KnockKnockClient.java
 
 ImageComm.class: ImageComm.java commons-imaging.jar
-	$(JCC) $(JFLAGS) -cp commons-imaging.jar ImageComm.java
+	$(JCC) $(JFLAGS) -cp .:commons-imaging.jar ImageComm.java
 
 commons-imaging.jar:
 	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140107.130740-4.jar

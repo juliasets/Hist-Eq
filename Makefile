@@ -6,10 +6,10 @@ default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockSe
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
 
-KKMultiServerThread.class: KKMultiServerThread.java
+KKMultiServerThread.class: KKMultiServerThread.java ProcessorAccessList.class
 	$(JCC) $(JFLAGS) KKMultiServerThread.java
 
-KKMultiServer.class: KKMultiServer.java
+KKMultiServer.class: KKMultiServer.java ProcessorAccessList.class
 	$(JCC) $(JFLAGS) KKMultiServer.java
 
 KnockKnockServer.class: KnockKnockServer.java
@@ -23,6 +23,9 @@ KnockKnockClient.class: KnockKnockClient.java ImageComm.class commons-imaging.ja
 
 ImageComm.class: ImageComm.java commons-imaging.jar
 	$(JCC) $(JFLAGS) -cp .:commons-imaging.jar ImageComm.java
+	
+ProcessorAccessList.class: ProcessorAccessList.java
+	$(JCC) $(JFLAGS) ProcessorAccessList.java
 
 commons-imaging.jar:
 	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140107.130740-4.jar

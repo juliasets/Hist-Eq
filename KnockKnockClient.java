@@ -47,7 +47,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class KnockKnockClient {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ImageReadException {
         
         if (args.length != 3) {
             System.err.println(
@@ -68,7 +68,7 @@ public class KnockKnockClient {
         	if (names.get(i).endsWith(".jpg") ||
         		names.get(i).endsWith(".JPG") ||
         		names.get(i).endsWith(".png") ||
-        		names.get(i).endsWith(".png"))
+        		names.get(i).endsWith(".PNG"))
         	{
         		inputFilenames.add(names.get(i));
         		//outputFilenames.add("processed-" + names.get(i));
@@ -91,7 +91,7 @@ public class KnockKnockClient {
 		        
 		        ImageComm ic = new ImageComm(kkSocket);
 		        
-		        ic.sndimg(im);//send image
+		        ic.sendimg(im);//send image
 
 		        /*while ((fromServer = in.readLine()) != null) {
 		            System.out.println("Server: " + fromServer);

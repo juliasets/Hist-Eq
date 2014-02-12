@@ -40,12 +40,13 @@ public class KKMultiServer {
         System.exit(1);
     }
 
+		ProcessorAccessList pal = new ProcessorAccessList();
         int portNumber = Integer.parseInt(args[0]);
         boolean listening = true;
         
         try (ServerSocket serverSocket = new ServerSocket(portNumber)) { 
             while (listening) {
-	            new KKMultiServerThread(serverSocket.accept()).start();
+	            new KKMultiServerThread(serverSocket.accept(), pal).start();
 	        }
 	    } catch (IOException e) {
             System.err.println("Could not listen on port " + portNumber);

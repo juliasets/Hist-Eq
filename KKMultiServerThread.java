@@ -31,37 +31,64 @@
 
 import java.net.*;
 import java.io.*;
+import java.util.*;
+import java.awt.*;
+import java.awt.image.*;
+
+import org.apache.commons.imaging.*;
+
 
 public class KKMultiServerThread extends Thread {
     private Socket socket = null;
+    private ProcessorAccessList pal;
 
-    public KKMultiServerThread(Socket socket) {
+    public KKMultiServerThread(Socket socket, ProcessorAccessList pal) {
         super("KKMultiServerThread");
         this.socket = socket;
+        this.pal = pal;
     }
     
     public void run() {
 
-        try (
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(
-                                                    new InputStreamReader(
-                                                                          socket.getInputStream()));
-             ) {
-                String inputLine, outputLine;
-                KnockKnockProtocol kkp = new KnockKnockProtocol();
-                outputLine = kkp.processInput(null);
-                out.println(outputLine);
-
-                while ((inputLine = in.readLine()) != null) {
-                    outputLine = kkp.processInput(inputLine);
-                    out.println(outputLine);
-                    if (outputLine.equals("Bye"))
-                        break;
-                }
-                socket.close();
-            } catch (IOException e) {
-            e.printStackTrace();
+        try{
+            String message;
+            BufferedImage im;
+            
+            ImageComm ic = new ImageComm(socket);
+            
+            message = ic.recvmsg();
+            
+            if (message == "processor")
+            {
+            	pal.put(socket);
+            }
+            else
+            {
+            	int numImages = Integer.parseInt(message);
+            	if (numImages <= 0)
+            	{
+            		ic.sendmsg("Close");
+            		socket.close();
+            		return;
+            	}
+            	ic.sendmsg("Confirm");
+            	ArrayList<String> names = new ArrayList<String>();
+            	ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+            	
+            	for (int i = 0; i < numImages; i++)
+            	{
+            		names.add(ic.recvmsg());
+            		ic.sendmsg("Confirm");
+            		images.add(ic.recvimg());
+            		ic.sendmsg("" + i);
+            	}
+            	
+            	ArrayList<Socket> processors = new ArrayList<Socket>();
+            	
+            }
+            socket.close();
+        }catch (ImageReadException e) {} catch (IOException e) {
+        e.printStackTrace();
         }
     }
 }

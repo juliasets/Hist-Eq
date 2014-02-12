@@ -6,6 +6,11 @@ import java.util.*;
 public class ProcessorAccessList{
 	private ArrayList<Socket> processors;
 	
+	public ProcessorAccessList()
+	{
+		processors = new ArrayList<Socket>();
+	}
+	
 	public synchronized Socket get()
 	{
 		while (processors.size() == 0){

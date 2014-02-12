@@ -12,10 +12,10 @@ default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockSe
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
 
-KKMultiServerThread.class: KKMultiServerThread.java ProcessorAccessList.class
+KKMultiServerThread.class: KKMultiServerThread.java ProcessorAccessList.class commons-imaging.jar
 	$(JCC) $(JFLAGS) KKMultiServerThread.java
 
-KKMultiServer.class: KKMultiServer.java ProcessorAccessList.class
+KKMultiServer.class: KKMultiServer.java ProcessorAccessList.class KKMultiServerThread.class
 	$(JCC) $(JFLAGS) KKMultiServer.java
 
 KnockKnockServer.class: KnockKnockServer.java

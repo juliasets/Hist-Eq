@@ -26,8 +26,10 @@ public class ImageComm {
 		return in.readLine();
 	}
 
-	public void sendimg (BufferedImage image) {
-		
+	public void sendimg (BufferedImage image) throws IOException, ImageWriteException {
+		out.println(
+				DatatypeConverter.printBase64Binary(
+						Imaging.writeImageToBytes(image, ImageFormats.PNG, null)));
 	}
 
 	public BufferedImage recvimg () throws IOException, ImageReadException {

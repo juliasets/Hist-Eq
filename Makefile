@@ -22,4 +22,5 @@ KnockKnockClient.class: KnockKnockClient.java
 	$(JCC) $(JFLAGS) KnockKnockClient.java
 
 clean: 
-	$(RM) *.class
+	$(RM) *.class *~
+

@@ -11,6 +11,7 @@ public class ImageComm {
 
 	private PrintWriter out;
 	private BufferedReader in;
+	private String temp;
 
 	public ImageComm (Socket socket) throws IOException {
 		out = new PrintWriter(socket.getOutputStream(), true);
@@ -33,8 +34,13 @@ public class ImageComm {
 	}
 
 	public BufferedImage recvimg () throws IOException, ImageReadException {
+		temp = in.readLine();
+		if (temp == null)
+		{
+			throw new ImageReadException("Nothing for recvimg to read");
+		}
 		return Imaging.getBufferedImage(
-				DatatypeConverter.parseBase64Binary(in.readLine()));
+				DatatypeConverter.parseBase64Binary(temp));
 	}
 
 }

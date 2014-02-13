@@ -1,9 +1,11 @@
 import java.awt.Color;
+import java.net.Socket;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.imageio.ImageIO;
+import org.apache.commons.imaging.*;
 
 public class Worker{
 	/**
@@ -15,21 +17,60 @@ public class Worker{
  
     private static BufferedImage original, equalized;
  
-    public static void main(String[] args) throws IOException {
- 
-        File original_f = new File(args[0]+".jpg");
-        String output_f = args[1];
-        original = ImageIO.read(original_f);
-        equalized = histogramEqualization(original);
-        writeImage(output_f);
- 
+    public static void main(String[] args) throws IOException, ImageReadException, ImageWriteException {
+        
+        if (args.length != 2) {
+            System.err.println(
+                "Usage: java EchoWorker <host name> <port number>");
+            System.exit(1);
+        }
+
+        String hostName = args[0];
+        int portNumber = Integer.parseInt(args[1]);
+
+        while (true)
+        {
+	        try (
+	                Socket kkSocket = new Socket(hostName, portNumber);
+	                //PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
+	                //BufferedReader in = new BufferedReader(
+	                //    new InputStreamReader(kkSocket.getInputStream()));
+	            ) {
+	            ImageComm ic = new ImageComm(kkSocket);
+	            String message;
+	            
+	            ic.sendmsg("processor");
+
+	            //get job
+	            message = ic.recvmsg();
+	            while (message != "Job")
+	            {
+	            	message = ic.recvmsg();
+	            }
+	            ic.sendmsg("Ready");
+	            original = ic.recvimg();            
+	
+	            //equalize received job
+	            equalized = histogramEqualization(original);
+	            
+	            //send processed job back to server and close
+	            ic.sendmsg("Ready");
+	            message = ic.recvmsg();
+	            if (!message.equals("Confirm"))
+	            {
+	            	//problem with protocol
+	            }
+	            ic.sendimg(equalized);//send image
+	            message = ic.recvmsg();
+	            if (!message.equals("Close"))
+	            {
+	            	//problem with protocol
+	            }
+	            kkSocket.close();	            
+	        }
+	    } 
     }
- 
-    private static void writeImage(String output) throws IOException {
-        File file = new File(output+".jpg");
-        ImageIO.write(equalized, "jpg", file);
-    }
- 
+  
     private static BufferedImage histogramEqualization(BufferedImage original) {
  
         int red;

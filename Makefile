@@ -7,7 +7,7 @@ endif
 
 JFLAGS = -g -cp $(CLASSPATH)
 
-default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockServer.class KnockKnockProtocol.class KnockKnockClient.class ImageComm.class
+default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockServer.class TestServer.class KnockKnockProtocol.class KnockKnockClient.class TestClient.class ImageComm.class
 
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
@@ -21,11 +21,17 @@ KKMultiServer.class: KKMultiServer.java ProcessorAccessList.class KKMultiServerT
 KnockKnockServer.class: KnockKnockServer.java
 	$(JCC) $(JFLAGS) KnockKnockServer.java
 
+TestServer.class: TestServer.java ImageComm.class commons-imaging.jar
+	$(JCC) $(JFLAGS) TestServer.java
+
 KnockKnockProtocol.class: KnockKnockProtocol.java
 	$(JCC) $(JFLAGS) KnockKnockProtocol.java
 
 KnockKnockClient.class: KnockKnockClient.java ImageComm.class commons-imaging.jar
 	$(JCC) $(JFLAGS) KnockKnockClient.java
+
+TestClient.class: TestClient.java ImageComm.class commons-imaging.jar
+	$(JCC) $(JFLAGS) TestClient.java
 
 ImageComm.class: ImageComm.java commons-imaging.jar
 	$(JCC) $(JFLAGS) ImageComm.java

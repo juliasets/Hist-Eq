@@ -58,7 +58,7 @@ public class KKMultiServerThread extends Thread {
             
             message = ic.recvmsg();
             
-            if (message == "processor")
+            if (message.equals("processor"))
             {
             	pal.put(socket);
             }
@@ -93,7 +93,7 @@ public class KKMultiServerThread extends Thread {
             		icTmp = new ImageComm(skt);
             		icTmp.sendmsg("Job");
             		message = icTmp.recvmsg();
-            		while (message != "Ready")
+            		while (!message.equals("Ready"))
             		{
             			icTmp.sendmsg("Close");
             			skt.close();
@@ -118,7 +118,7 @@ public class KKMultiServerThread extends Thread {
             		skt = processors.get(0);
             		icTmp = new ImageComm(skt);
             		message = icTmp.recvmsg();
-            		if (message != "Ready")
+            		if (!message.equals("Ready"))
             		{
             			//problem following protocol
             		}
@@ -130,7 +130,7 @@ public class KKMultiServerThread extends Thread {
             	
             	ic.sendmsg("Ready");
             	message = ic.recvmsg();
-            	if (message != "Confirm")
+            	if (!message.equals("Confirm"))
             	{
             		//problem following protocol
             	}
@@ -138,14 +138,14 @@ public class KKMultiServerThread extends Thread {
             	{
             		ic.sendmsg(names.get(i));
             		message = ic.recvmsg();
-            		while (message != "Confirm")
+            		while (!message.equals("Confirm"))
             		{
             			ic.sendmsg(names.get(i));
             			message = ic.recvmsg();
             		}
             		ic.sendimg(images.get(i));
             		message = ic.recvmsg();
-            		while (message != "Confirm")
+            		while (!message.equals("Confirm"))
             		{
             			ic.sendimg(images.get(i));
             			message = ic.recvmsg();

@@ -88,21 +88,21 @@ public class KnockKnockClient {
             ic.sendmsg("" + inputFilenames.size());
             message = ic.recvmsg();
             
-            if (message != "Confirm")
+            if (!message.equals("Confirm"))
             {
             	//problem with protocol
             }
             
             for (int i = 0; i < inputFilenames.size(); i++)
             {
-		        File f = new File(inputFilenames.get(i));
+		        File f = new File(args[2] + "/" + inputFilenames.get(i));
 		        BufferedImage im = Imaging.getBufferedImage(f);
-		        
+
 		        ic.sendmsg(inputFilenames.get(i));
 		        
 		        message = ic.recvmsg();
 		        
-		        if (message != "Confirm")
+		        if (!message.equals("Confirm"))
 		        {
 		        	//problem with protocol
 		        }
@@ -122,6 +122,7 @@ public class KnockKnockClient {
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
+            e.printStackTrace();
             System.exit(1);
         } 
     }

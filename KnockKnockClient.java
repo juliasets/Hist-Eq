@@ -102,7 +102,7 @@ public class KnockKnockClient implements Runnable {
             
             for (int i = 0; i < inputFilenames.size(); i++)
             {//send images to serverThread
-		        f = new File(args[2] + "/" + inputFilenames.get(i));
+		        f = new File(directory + "/" + inputFilenames.get(i));
 		        im = Imaging.getBufferedImage(f);
 		        imgfs.add(Imaging.guessFormat(f));
 		        

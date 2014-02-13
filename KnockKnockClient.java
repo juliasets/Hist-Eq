@@ -81,30 +81,40 @@ public class KnockKnockClient {
             //BufferedReader in = new BufferedReader(
             //    new InputStreamReader(kkSocket.getInputStream()));
         ) {
-            //Create object with socket
-            //skt
+            ImageComm ic = new ImageComm(kkSocket);
+            String message;
+            int count;
+            
+            ic.sendmsg("" + inputFilenames.size());
+            message = ic.recvmsg();
+            
+            if (message != "Confirm")
+            {
+            	//problem with protocol
+            }
             
             for (int i = 0; i < inputFilenames.size(); i++)
             {
 		        File f = new File(inputFilenames.get(i));
 		        BufferedImage im = Imaging.getBufferedImage(f);
 		        
-		        ImageComm ic = new ImageComm(kkSocket);
+		        ic.sendmsg(inputFilenames.get(i));
+		        
+		        message = ic.recvmsg();
+		        
+		        if (message != "Confirm")
+		        {
+		        	//problem with protocol
+		        }
 		        
 		        ic.sendimg(im);//send image
-
-		        /*while ((fromServer = in.readLine()) != null) {
-		            System.out.println("Server: " + fromServer);
-		            if (fromServer.equals("Bye."))
-		                break;
-		            
-		            fromUser = stdIn.readLine();
-		            if (fromUser != null) {
-		                System.out.println("Client: " + fromUser);
-		                out.println(fromUser);
-		            }
-		            
-		        }*/
+		        
+		        count = Integer.parseInt(ic.recvmsg());
+		        
+		        if (count != i)
+		        {
+		        	//problem with serverThread
+		        }
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

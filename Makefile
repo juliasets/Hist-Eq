@@ -1,13 +1,23 @@
-JCC = javac
+SHELL := /bin/bash
 
-CLASSPATH = .:commons-imaging.jar
+JCC := javac
+
+CLASSPATH := .:commons-imaging.jar
+
+JARCP := $(shell echo $(CLASSPATH) | sed "s/:/ /g")
 ifeq ($(shell uname -o),Cygwin)
         CLASSPATH := "$(shell cygpath -wp $(CLASSPATH))"
 endif
 
 JFLAGS = -g -cp $(CLASSPATH)
 
-default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockServer.class TestServer.class KnockKnockProtocol.class KnockKnockClient.class TestClient.class ImageComm.class
+JAR = jar cmfe <(echo "Class-Path: $(JARCP)")
+
+.PHONY: default
+default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockServer.class KnockKnockProtocol.class KnockKnockClient.class TestServer.class TestClient.class ImageComm.class
+	$(JAR) KnockKnockClient.jar KnockKnockClient *.class
+	$(JAR) KnockKnockServer.jar KnockKnockServer *.class
+	# $(JAR) OUTPUT.JAR ENTRYPOINTNAME *.class
 
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
@@ -42,6 +52,7 @@ ProcessorAccessList.class: ProcessorAccessList.java
 commons-imaging.jar:
 	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140107.130740-4.jar
 
-clean: 
+.PHONY: clean
+clean:
 	$(RM) *.class *.jar *~
 

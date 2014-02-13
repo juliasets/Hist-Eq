@@ -19,6 +19,9 @@ default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockSe
 	$(JAR) KnockKnockServer.jar KnockKnockServer *.class
 	# $(JAR) OUTPUT.JAR ENTRYPOINTNAME *.class
 
+CreateWorkers.class: CreateWorkers.java Worker.class
+	$(JCC) $(JFLAGS) CreateWorkers.java
+
 Worker.class: Worker.java
 	$(JCC) $(JFLAGS) Worker.java
 
@@ -39,7 +42,7 @@ KnockKnockProtocol.class: KnockKnockProtocol.java
 
 KnockKnockClient.class: KnockKnockClient.java ImageComm.class commons-imaging.jar
 	$(JCC) $(JFLAGS) KnockKnockClient.java
-	
+
 MassClient.class: MassClient.java KnockKnockClient.class
 	$(JCC) $(JFLAGS) MassClient.java
 
@@ -48,7 +51,7 @@ TestClient.class: TestClient.java ImageComm.class commons-imaging.jar
 
 ImageComm.class: ImageComm.java commons-imaging.jar
 	$(JCC) $(JFLAGS) ImageComm.java
-	
+
 ProcessorAccessList.class: ProcessorAccessList.java
 	$(JCC) $(JFLAGS) ProcessorAccessList.java
 

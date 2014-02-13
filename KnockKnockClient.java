@@ -46,18 +46,21 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class KnockKnockClient {
-    public static void main(String[] args) throws IOException, ImageReadException, ImageWriteException {
-        
-        if (args.length != 3) {
-            System.err.println(
-                "Usage: java EchoClient <host name> <port number> <directory>");
-            System.exit(1);
-        }
+public class KnockKnockClient implements Runnable {
+	private String hostName;
+	private int portNumber;
+	private String directory;
+	
+	public KnockKnockClient(String hostName, int portNumber, String directory)
+	{
+		this.hostName = hostName;
+		this.portNumber = portNumber;
+		this.directory = directory;
+	}
 
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
-        File dir = new File(args[2]);
+    public void run(){
+	
+        File dir = new File(directory);
         ArrayList<String> names = new ArrayList<String>(Arrays.asList(dir.list()));
         
         ArrayList<String> inputFilenames = new ArrayList<String>();
@@ -93,10 +96,15 @@ public class KnockKnockClient {
             	//problem with protocol
             }
             
+            ArrayList<ImageFormat> imgfs = new ArrayList<ImageFormat>();
+            File f;
+            BufferedImage im;
+            
             for (int i = 0; i < inputFilenames.size(); i++)
-            {
-		        File f = new File(inputFilenames.get(i));
-		        BufferedImage im = Imaging.getBufferedImage(f);
+            {//send images to serverThread
+		        f = new File(inputFilenames.get(i));
+		        im = Imaging.getBufferedImage(f);
+		        imgfs.add(Imaging.guessFormat(f));
 		        
 		        ic.sendmsg(inputFilenames.get(i));
 		        
@@ -116,6 +124,35 @@ public class KnockKnockClient {
 		        	//problem with serverThread
 		        }
             }
+            
+            message = ic.recvmsg();
+            while (message != "Ready")
+            {
+            	message = ic.recvmsg();
+            }
+            
+            ic.sendmsg("Confirm");
+            
+            int j;
+            ImageFormat imgf;
+            for (int i = 0; i < inputFilenames.size(); i++)
+            {//receive images from server
+            	message = ic.recvmsg();
+            	for (j = 0; (j<inputFilenames.size()) && 
+            		(message!=inputFilenames.get(j)); j++){}
+            	f = new File("processed-" + message);
+            	imgf = imgfs.get(j);
+            	
+            	ic.sendmsg("Confirm");
+            	
+		        im = ic.recvimg();
+		        
+		        ic.sendmsg("Confirm");
+		        
+		        //write image
+		        Imaging.writeImage(im, f, imgf, null);
+            }
+            
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
@@ -123,6 +160,12 @@ public class KnockKnockClient {
             System.err.println("Couldn't get I/O for the connection to " +
                 hostName);
             System.exit(1);
-        } 
+        } catch (ImageReadException e) {
+        	System.err.println("ImageReadException");
+        	System.exit(1);
+        } catch (ImageWriteException e) {
+        	System.err.println("ImageWriteException");
+        	System.exit(1);
+        }
     }
 }

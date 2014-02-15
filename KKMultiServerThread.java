@@ -162,9 +162,9 @@ public class KKMultiServerThread extends Thread {
             		}
             	}
             	System.out.println("Sent to client");
+		        ic.sendmsg("Close");
+		        socket.close();
             }
-            ic.sendmsg("Close");
-            socket.close();
         }catch (ImageReadException e) {} catch (ImageWriteException e) {} 
         catch (IOException e) {
         e.printStackTrace();

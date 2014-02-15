@@ -44,7 +44,7 @@ public class Worker{
 				System.out.println("Requested job");
 	            //get job
 	            message = ic.recvmsg();
-	            while (message != "Job")
+	            while (!message.equals("Job"))
 	            {
 	            	message = ic.recvmsg();
 	            }

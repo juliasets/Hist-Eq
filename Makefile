@@ -22,7 +22,7 @@ default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockSe
 CreateWorkers.class: CreateWorkers.java Worker.class
 	$(JCC) $(JFLAGS) CreateWorkers.java
 
-Worker.class: Worker.java
+Worker.class: Worker.java commons-imaging.jar
 	$(JCC) $(JFLAGS) Worker.java
 
 KKMultiServerThread.class: KKMultiServerThread.java ProcessorAccessList.class commons-imaging.jar

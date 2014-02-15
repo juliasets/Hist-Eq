@@ -126,7 +126,7 @@ public class KnockKnockClient implements Runnable {
             }
             
             message = ic.recvmsg();
-            while (message != "Ready")
+            while (!message.equals("Ready"))
             {
             	message = ic.recvmsg();
             }
@@ -140,7 +140,7 @@ public class KnockKnockClient implements Runnable {
             	message = ic.recvmsg();
             	for (j = 0; (j<inputFilenames.size()) && 
             		(message!=inputFilenames.get(j)); j++){}
-            	f = new File("processed-" + message);
+            	f = new File(directory + "/" + "processed-" + message);
             	imgf = imgfs.get(j);
             	
             	ic.sendmsg("Confirm");

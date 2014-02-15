@@ -68,9 +68,7 @@ public class KnockKnockClient implements Runnable {
         
         for (int i = 0; i < names.size(); i++)
         {
-        	if (names.get(i).endsWith(".jpg") ||
-        		names.get(i).endsWith(".JPG") ||
-        		names.get(i).endsWith(".png") ||
+        	if (names.get(i).endsWith(".png") ||
         		names.get(i).endsWith(".PNG"))
         	{
         		inputFilenames.add(names.get(i));
@@ -98,7 +96,6 @@ public class KnockKnockClient implements Runnable {
             	System.out.println("Protocol problem c");
             }
             
-            ArrayList<ImageFormat> imgfs = new ArrayList<ImageFormat>();
             File f;
             BufferedImage im;
             System.out.println("Sending images");
@@ -106,7 +103,6 @@ public class KnockKnockClient implements Runnable {
             {//send images to serverThread
 		        f = new File(directory + "/" + inputFilenames.get(i));
 		        im = Imaging.getBufferedImage(f);
-		        imgfs.add(Imaging.guessFormat(f));
 		        
 		        ic.sendmsg(inputFilenames.get(i));
 		        
@@ -138,14 +134,12 @@ public class KnockKnockClient implements Runnable {
             ic.sendmsg("Confirm");
             System.out.println("Receiving images");
             int j;
-            ImageFormat imgf;
             for (int i = 0; i < inputFilenames.size(); i++)
             {//receive images from server
             	message = ic.recvmsg();
-            	for (j = 0; (j<inputFilenames.size()) && 
-            		(message!=inputFilenames.get(j)); j++){}
+            	/*for (j = 0; (j<inputFilenames.size()) && 
+            		(message!=inputFilenames.get(j)); j++){}*/
             	f = new File(directory + "/" + "processed-" + message);
-            	imgf = imgfs.get(j);
             	
             	ic.sendmsg("Confirm");
             	
@@ -154,7 +148,7 @@ public class KnockKnockClient implements Runnable {
 		        ic.sendmsg("Confirm");
 		        
 		        //write image
-		        Imaging.writeImage(im, f, imgf, null);
+		        Imaging.writeImage(im, f, ImageFormats.PNG, null);
             }
             System.out.println("Done");
         } catch (UnknownHostException e) {

@@ -84,22 +84,24 @@ public class KnockKnockClient implements Runnable {
             //BufferedReader in = new BufferedReader(
             //    new InputStreamReader(kkSocket.getInputStream()));
         ) {
+        	System.out.println("Connection established");
             ImageComm ic = new ImageComm(kkSocket);
             String message;
             int count;
-            
+            System.out.println("Sending num files");
             ic.sendmsg("" + inputFilenames.size());
             message = ic.recvmsg();
             
             if (!message.equals("Confirm"))
             {
             	//problem with protocol
+            	System.out.println("Protocol problem c");
             }
             
             ArrayList<ImageFormat> imgfs = new ArrayList<ImageFormat>();
             File f;
             BufferedImage im;
-            
+            System.out.println("Sending images");
             for (int i = 0; i < inputFilenames.size(); i++)
             {//send images to serverThread
 		        f = new File(directory + "/" + inputFilenames.get(i));
@@ -113,6 +115,7 @@ public class KnockKnockClient implements Runnable {
 		        if (!message.equals("Confirm"))
 		        {
 		        	//problem with protocol
+		        	System.out.println("Protocol problem d");
 		        }
 		        
 		        ic.sendimg(im);//send image
@@ -122,9 +125,10 @@ public class KnockKnockClient implements Runnable {
 		        if (count != i)
 		        {
 		        	//problem with serverThread
+		        	System.out.println("Protocol problem e");
 		        }
             }
-            
+            System.out.println("Images sent");
             message = ic.recvmsg();
             while (!message.equals("Ready"))
             {
@@ -132,7 +136,7 @@ public class KnockKnockClient implements Runnable {
             }
             
             ic.sendmsg("Confirm");
-            
+            System.out.println("Receiving images");
             int j;
             ImageFormat imgf;
             for (int i = 0; i < inputFilenames.size(); i++)
@@ -152,7 +156,7 @@ public class KnockKnockClient implements Runnable {
 		        //write image
 		        Imaging.writeImage(im, f, imgf, null);
             }
-            
+            System.out.println("Done");
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);

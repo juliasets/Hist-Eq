@@ -61,6 +61,7 @@ public class KKMultiServerThread extends Thread {
             if (message.equals("processor"))
             {
             	pal.put(socket);
+            	System.out.println("Processor connected");
             }
             else
             {
@@ -72,9 +73,11 @@ public class KKMultiServerThread extends Thread {
             		return;
             	}
             	ic.sendmsg("Confirm");
+            	System.out.println("Received num images");
             	ArrayList<String> names = new ArrayList<String>();
             	ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
             	
+            	System.out.println("Receiving images");
             	for (int i = 0; i < numImages; i++)
             	{//receiving images from client
             		names.add(ic.recvmsg());
@@ -82,11 +85,12 @@ public class KKMultiServerThread extends Thread {
             		images.add(ic.recvimg());
             		ic.sendmsg("" + i);
             	}
-            	
+            	System.out.println("Received images");
             	ArrayList<Socket> processors = new ArrayList<Socket>();
             	Socket skt;
             	ImageComm icTmp;
             	
+            	System.out.println("Sending to worker");
             	for (int i = 0; i < numImages; i++)
             	{//sending images to workers
             		skt = pal.get();
@@ -105,6 +109,7 @@ public class KKMultiServerThread extends Thread {
             		icTmp.sendimg(images.remove(0));
             		processors.add(skt);
             	}
+            	System.out.println("Sent to worker");
             	
             	while (images.size() > 0)
             	{
@@ -113,6 +118,7 @@ public class KKMultiServerThread extends Thread {
             		images.remove(0);
             	}
             	
+            	System.out.println("Receiving from workers");
             	for (int i = 0; i < numImages; i++)
             	{//getting images from workers
             		skt = processors.get(0);
@@ -121,19 +127,23 @@ public class KKMultiServerThread extends Thread {
             		if (!message.equals("Ready"))
             		{
             			//problem following protocol
+            			System.out.println("Protocol problem a");
             		}
             		icTmp.sendmsg("Confirm");
             		images.add(icTmp.recvimg());
             		icTmp.sendmsg("Close");
             		skt.close();
             	}
+            	System.out.println("Received from workers");
             	
             	ic.sendmsg("Ready");
             	message = ic.recvmsg();
             	if (!message.equals("Confirm"))
             	{
             		//problem following protocol
+            		System.out.println("Protocol problem b");
             	}
+            	System.out.println("Sending to Client");
             	for (int i = 0; i < numImages; i++)
             	{
             		ic.sendmsg(names.get(i));
@@ -151,6 +161,7 @@ public class KKMultiServerThread extends Thread {
             			message = ic.recvmsg();
             		}
             	}
+            	System.out.println("Sent to client");
             }
             ic.sendmsg("Close");
             socket.close();

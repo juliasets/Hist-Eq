@@ -36,37 +36,44 @@ public class Worker{
 	                //BufferedReader in = new BufferedReader(
 	                //    new InputStreamReader(kkSocket.getInputStream()));
 	            ) {
+	            System.out.println("Processor connected");
 	            ImageComm ic = new ImageComm(kkSocket);
 	            String message;
 	            
 	            ic.sendmsg("processor");
-
+				System.out.println("Requested job");
 	            //get job
 	            message = ic.recvmsg();
 	            while (message != "Job")
 	            {
 	            	message = ic.recvmsg();
 	            }
+	            System.out.println("Job available");
 	            ic.sendmsg("Ready");
 	            original = ic.recvimg();            
-	
+				System.out.println("Job received");
 	            //equalize received job
 	            equalized = histogramEqualization(original);
-	            
+	            System.out.println("Job finished");
 	            //send processed job back to server and close
 	            ic.sendmsg("Ready");
 	            message = ic.recvmsg();
 	            if (!message.equals("Confirm"))
 	            {
 	            	//problem with protocol
+	            	System.out.println("Protocol problem f");
 	            }
+	            System.out.println("Sending finished job");
 	            ic.sendimg(equalized);//send image
 	            message = ic.recvmsg();
+	            System.out.println("Sent finished job");
 	            if (!message.equals("Close"))
 	            {
 	            	//problem with protocol
+	            	System.out.println("Protocol problem g");
 	            }
-	            kkSocket.close();	            
+	            kkSocket.close();	
+	            System.out.println("Exiting");            
 	        }
 	    } 
     }

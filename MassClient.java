@@ -14,10 +14,10 @@ class MassClient{
 		String hostName = args[0];
 		int portNumber = Integer.parseInt(args[1]);
 		
-		String[] directories = new String[3];
+		String[] directories = new String[1];
 		directories[0] = "Photos1";
-		directories[1] = "Photos2";
-		directories[2] = "Photos3";
+		//directories[1] = "Photos2";
+		//directories[2] = "Photos3";
 		
 		ExecutorService executor = 
 			Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());

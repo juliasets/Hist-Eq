@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import org.apache.commons.imaging.*;
 
-public class Worker{
+public class Worker implements Runnable {
 	/**
  * Image histogram equalization
  *
@@ -16,25 +16,22 @@ public class Worker{
  */
  
     private static BufferedImage original, equalized;
+    
+    private String hostName;
+    private int portNumber;
+    
+    public Worker(String hostName, int portNumber)
+    {
+    	this.hostName = hostName;
+		this.portNumber = portNumber;
+    }
  
-    public static void main(String[] args) throws IOException, ImageReadException, ImageWriteException {
-        
-        if (args.length != 2) {
-            System.err.println(
-                "Usage: java EchoWorker <host name> <port number>");
-            System.exit(1);
-        }
-
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+    public void run() {
 
         while (true)
         {
 	        try (
 	                Socket kkSocket = new Socket(hostName, portNumber);
-	                //PrintWriter out = new PrintWriter(kkSocket.getOutputStream(), true);
-	                //BufferedReader in = new BufferedReader(
-	                //    new InputStreamReader(kkSocket.getInputStream()));
 	            ) {
 	            System.out.println("Processor connected");
 	            ImageComm ic = new ImageComm(kkSocket);
@@ -74,7 +71,18 @@ public class Worker{
 	            }
 	            kkSocket.close();	
 	            System.out.println("Exiting");            
-	        }
+	        } catch (IOException e) {
+		        System.err.println("Couldn't get I/O for the connection to " +
+		            hostName);
+		        e.printStackTrace();
+		        System.exit(1);
+		    } catch (ImageReadException e) {
+		    	System.err.println("ImageReadException");
+		    	System.exit(1);
+		    } catch (ImageWriteException e) {
+		    	System.err.println("ImageWriteException");
+		    	System.exit(1);
+		    }
 	    } 
     }
   

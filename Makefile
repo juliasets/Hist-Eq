@@ -14,7 +14,7 @@ JFLAGS = -g -cp $(CLASSPATH)
 JAR = jar cmfe <(echo "Class-Path: $(JARCP)")
 
 .PHONY: default
-default: Worker.class KKMultiServerThread.class KKMultiServer.class KnockKnockServer.class KnockKnockProtocol.class KnockKnockClient.class MassClient.class TestServer.class TestClient.class ImageComm.class
+default: Worker.class CreateWorkers.class KKMultiServerThread.class KKMultiServer.class KnockKnockProtocol.class KnockKnockClient.class MassClient.class ImageComm.class
 	$(JAR) MassClient.jar MassClient *.class
 	$(JAR) KnockKnockServer.jar KnockKnockServer *.class
 	# $(JAR) OUTPUT.JAR ENTRYPOINTNAME *.class
@@ -30,9 +30,6 @@ KKMultiServerThread.class: KKMultiServerThread.java ProcessorAccessList.class co
 
 KKMultiServer.class: KKMultiServer.java ProcessorAccessList.class KKMultiServerThread.class
 	$(JCC) $(JFLAGS) KKMultiServer.java
-
-KnockKnockServer.class: KnockKnockServer.java
-	$(JCC) $(JFLAGS) KnockKnockServer.java
 
 TestServer.class: TestServer.java ImageComm.class commons-imaging.jar
 	$(JCC) $(JFLAGS) TestServer.java

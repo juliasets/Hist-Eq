@@ -16,6 +16,7 @@ JAR = jar cmfe <(echo "Class-Path: $(JARCP)")
 .PHONY: default
 default: Worker.class CreateWorkers.class KKMultiServerThread.class KKMultiServer.class KnockKnockProtocol.class KnockKnockClient.class MassClient.class ImageComm.class
 	$(JAR) MassClient.jar MassClient *.class
+	$(JAR) CreateWorkers.jar CreateWorkers *.class
 	$(JAR) KnockKnockServer.jar KnockKnockServer *.class
 	# $(JAR) OUTPUT.JAR ENTRYPOINTNAME *.class
 

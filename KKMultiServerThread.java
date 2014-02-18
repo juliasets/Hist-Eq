@@ -58,60 +58,68 @@ public class KKMultiServerThread extends Thread {
             	ArrayList<Socket> processors = new ArrayList<Socket>();
             	Socket skt;
             	ImageComm icTmp;
-            	
-            	System.out.println("Sending to worker");
-            	for (int i = 0; i < numImages; i++)
-            	{//sending images to workers
-            		skt = pal.get();
-            		while (skt.isClosed())
-            		{
-            			skt = pal.get();
-            		}
-            		icTmp = new ImageComm(skt);
-            		icTmp.sendmsg("Job");
-            		message = icTmp.recvmsg();
-            		while (!message.equals("Ready"))
-            		{
-            			icTmp.sendmsg("Close");
-            			skt.close();
-            			skt = pal.get();
-            			while (skt.isClosed())
-		        		{
-		        			skt = pal.get();
-		        		}
-		        		icTmp = new ImageComm(skt);
-		        		icTmp.sendmsg("Job");
-		        		message = icTmp.recvmsg();
-            		}
-            		icTmp.sendimg(images.remove(0));
-            		processors.add(skt);
-            	}
-            	System.out.println("Sent to worker");
+            	ArrayList<BufferedImage> out = new ArrayList<BufferedImage>();
             	
             	while (images.size() > 0)
             	{
-            		//Somehow missed one. Shouldn't happen, but to prevent more
-            		//obscure errors
-            		images.remove(0);
+            	    System.out.println("Sending to worker");
+                	for (int i = 0; i < images.size(); i++)
+                	{//sending images to workers
+                		skt = pal.get(1000);
+                		if (skt == null)
+                		{
+                		    System.out.println("Ran out of processors at " + i);
+                		    break;
+                		}
+                		while (skt.isClosed())
+                		{
+                			skt = pal.get();
+                		}
+                		icTmp = new ImageComm(skt);
+                		icTmp.sendmsg("Job");
+                		message = icTmp.recvmsg();
+                		while (!message.equals("Ready"))
+                		{
+                			icTmp.sendmsg("Close");
+                			skt.close();
+                			skt = pal.get();
+                			while (skt.isClosed())
+		            		{
+		            			skt = pal.get();
+		            		}
+		            		icTmp = new ImageComm(skt);
+		            		icTmp.sendmsg("Job");
+		            		message = icTmp.recvmsg();
+                		}
+                		icTmp.sendimg(images.remove(0));
+                		processors.add(skt);
+                	}
+                	System.out.println("Sent to worker");
+                	
+                	System.out.println("Receiving from workers");
+                	while (processors.size() > 0)
+                	{//getting images from workers
+                		skt = processors.remove(0);
+                		icTmp = new ImageComm(skt);
+                		message = icTmp.recvmsg();
+                		if (!message.equals("Ready"))
+                		{
+                			//problem following protocol
+                			System.out.println("Protocol problem a");
+                		}
+                		icTmp.sendmsg("Confirm");
+                		out.add(icTmp.recvimg());
+                		icTmp.sendmsg("Close");
+                		skt.close();
+                	}
+                	System.out.println("Received from workers");
             	}
             	
-            	System.out.println("Receiving from workers");
-            	for (int i = 0; i < numImages; i++)
-            	{//getting images from workers
-            		skt = processors.get(0);
-            		icTmp = new ImageComm(skt);
-            		message = icTmp.recvmsg();
-            		if (!message.equals("Ready"))
-            		{
-            			//problem following protocol
-            			System.out.println("Protocol problem a");
-            		}
-            		icTmp.sendmsg("Confirm");
-            		images.add(icTmp.recvimg());
-            		icTmp.sendmsg("Close");
-            		skt.close();
+            	if (out.size() < numImages)
+            	{
+            		//Somehow missed one.
+            		System.out.println("Error missed image");
             	}
-            	System.out.println("Received from workers");
             	
             	ic.sendmsg("Ready");
             	message = ic.recvmsg();
@@ -130,7 +138,7 @@ public class KKMultiServerThread extends Thread {
             			ic.sendmsg(names.get(i));
             			message = ic.recvmsg();
             		}
-            		ic.sendimg(images.get(i));
+            		ic.sendimg(out.get(i));
             		message = ic.recvmsg();
             		while (!message.equals("Confirm"))
             		{

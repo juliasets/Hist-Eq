@@ -1,10 +1,10 @@
 // Create as many Workers as there are cores.
 // Runs once per machine.
 
-
+import java.util.concurrent.*;
 
 public class CreateWorkers {
-    public void main (String[] args) {
+    public static void main (String[] args) {
     
     if (args.length != 2) {
         System.err.println(
@@ -16,9 +16,14 @@ public class CreateWorkers {
     int portNumber = Integer.parseInt(args[1]);
     
 	int cores = Runtime.getRuntime().availableProcessors();
-	for (int i = 0; i < cores; ++i) {
+	
+	ExecutorService executor = 
+			Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+	
+	for (int i = 0; i < 1; ++i) {
 	    Worker new_worker = new Worker(hostName, portNumber); // put in proper constructor here
-	    new_worker.run();
+	    System.out.println("i " + i + " cores " + cores);
+	    executor.execute(new_worker);
 	}
     }
 }

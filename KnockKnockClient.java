@@ -39,6 +39,8 @@ public class KnockKnockClient implements Runnable {
         for (int i = 0; i < names.size(); i++)
         {
         	if (names.get(i).endsWith(".png") ||
+        	    names.get(i).endsWith(".jpg") ||
+        	    names.get(i).endsWith(".JPG") ||
         		names.get(i).endsWith(".PNG"))
         	{
         		inputFilenames.add(names.get(i));
@@ -56,10 +58,16 @@ public class KnockKnockClient implements Runnable {
             ic.sendmsg("" + inputFilenames.size());
             message = ic.recvmsg();
             
+            if (message.equals("Close"))
+            {
+                System.out.println("Request denied");
+                return;
+            }
+            
             if (!message.equals("Confirm"))
             {
             	//problem with protocol
-            	System.out.println("Protocol problem c");
+            	System.out.println("Protocol problem c " + message + " " + inputFilenames.size());
             }
             
             File f;
@@ -68,6 +76,7 @@ public class KnockKnockClient implements Runnable {
             for (int i = 0; i < inputFilenames.size(); i++)
             {//send images to serverThread
 		        f = new File(directory + "/" + inputFilenames.get(i));
+		        System.out.println(inputFilenames.get(i));
 		        im = Imaging.getBufferedImage(f);
 		        
 		        ic.sendmsg(inputFilenames.get(i));
@@ -100,12 +109,19 @@ public class KnockKnockClient implements Runnable {
             ic.sendmsg("Confirm");
             System.out.println("Receiving images");
             int j;
+            String outFilename;
             for (int i = 0; i < inputFilenames.size(); i++)
             {//receive images from server
             	message = ic.recvmsg();
             	/*for (j = 0; (j<inputFilenames.size()) && 
             		(message!=inputFilenames.get(j)); j++){}*/
-            	f = new File(directory + "/" + "processed-" + message);
+            	outFilename = directory + "/" + "processed-" + message;
+            	if (!(outFilename.endsWith(".png") ||
+            	    outFilename.endsWith(".PNG")))
+            	{
+            	    outFilename = outFilename + ".png";
+            	}
+            	f = new File(outFilename);
             	
             	ic.sendmsg("Confirm");
             	

@@ -1,31 +1,42 @@
 import java.util.concurrent.*;
 import java.util.*;
+import java.io.*;
 
 class MassClient{
 	public static void main(String[] args)
 	{
-		if (args.length != 2)
+		if (args.length != 3)
 		{
             System.err.println(
-                "Usage: java MassClient <host name> <port number>");
+                "Usage: java MassClient <host name> <port number> <directory>");
             System.exit(1);
 		}
 		
 		String hostName = args[0];
 		int portNumber = Integer.parseInt(args[1]);
+		String directory = args[2];
 		
-		String[] directories = new String[3];
-		directories[0] = "Photos1";
-		directories[1] = "Photos2";
-		directories[2] = "Photos3";
+		File dir = new File(directory);
+        ArrayList<String> names = new ArrayList<String>(Arrays.asList(dir.list()));
+        
+        ArrayList<String> directories = new ArrayList<String>();
+        
+        for (int i = 0; i < names.size(); i++)
+        {
+        	if (names.get(i).startsWith("Photos"))
+        	{
+        		directories.add(names.get(i));
+        	}
+        }
 		
 		ExecutorService executor = 
 			Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		
-		for (int i = 0; i < directories.length; i++)
+		for (int i = 0; i < directories.size(); i++)
 		{
 			Runnable client = new 
-				KnockKnockClient(hostName, portNumber, directories[i]);
+				KnockKnockClient(hostName, portNumber, 
+				    directory + "/" + directories.get(i));
 			executor.execute(client);
 		}
 		

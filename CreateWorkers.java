@@ -20,7 +20,7 @@ public class CreateWorkers {
 	ExecutorService executor = 
 			Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	
-	for (int i = 0; i < 1; ++i) {
+	for (int i = 0; i < cores; ++i) {
 	    Worker new_worker = new Worker(hostName, portNumber); // put in proper constructor here
 	    System.out.println("i " + i + " cores " + cores);
 	    executor.execute(new_worker);

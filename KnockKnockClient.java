@@ -142,11 +142,13 @@ public class KnockKnockClient implements Runnable {
             e.printStackTrace();
             System.exit(1);
         } catch (ImageReadException e) {
-        	System.err.println("ImageReadException");
-        	System.exit(1);
+            System.err.println("ImageReadException");
+            e.printStackTrace();
+            System.exit(1);
         } catch (ImageWriteException e) {
-        	System.err.println("ImageWriteException");
-        	System.exit(1);
+            System.err.println("ImageWriteException");
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 }

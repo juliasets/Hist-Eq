@@ -15,7 +15,7 @@ public class Worker implements Runnable {
  *
  */
  
-    private static BufferedImage original, equalized;
+    //private static BufferedImage original, equalized;
     
     private String hostName;
     private int portNumber;
@@ -33,6 +33,8 @@ public class Worker implements Runnable {
 	        try (
 	                Socket kkSocket = new Socket(hostName, portNumber);
 	            ) {
+	            BufferedImage original;
+	            BufferedImage equalized;
 	            System.out.println("Processor connected");
 	            ImageComm ic = new ImageComm(kkSocket);
 	            String message;

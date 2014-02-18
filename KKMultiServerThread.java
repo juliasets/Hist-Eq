@@ -73,7 +73,16 @@ public class KKMultiServerThread extends Thread {
                 		}
                 		while (skt.isClosed())
                 		{
-                			skt = pal.get();
+                			skt = pal.get(1000);
+                			if (skt == null)
+                    		{
+                    		    break;
+                    		}
+                		}
+                		if (skt == null)
+                		{
+                		    System.out.println("Ran out of processors at " + i);
+                		    break;
                 		}
                 		icTmp = new ImageComm(skt);
                 		icTmp.sendmsg("Job");
@@ -82,11 +91,25 @@ public class KKMultiServerThread extends Thread {
                 		{
                 			icTmp.sendmsg("Close");
                 			skt.close();
-                			skt = pal.get();
+                			skt = pal.get(1000);
+                			if (skt == null)
+                    		{
+                    		    System.out.println("Ran out of processors at " + i);
+                    		    break;
+                    		}
                 			while (skt.isClosed())
 		            		{
-		            			skt = pal.get();
+		            			skt = pal.get(1000);
+		            			if (skt == null)
+                        		{
+                        		    break;
+                        		}
 		            		}
+		            		if (skt == null)
+                    		{
+                    		    System.out.println("Ran out of processors at " + i);
+                    		    break;
+                    		}
 		            		icTmp = new ImageComm(skt);
 		            		icTmp.sendmsg("Job");
 		            		message = icTmp.recvmsg();

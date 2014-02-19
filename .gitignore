@@ -1,4 +1,7 @@
 
 *.class
 *.jar
+*.jpg
+*.JPG
+*.png
 

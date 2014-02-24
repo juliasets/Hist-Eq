@@ -10,7 +10,6 @@ public class Comrade {
     }
 
     public static void main (String[] argv) {
-        System.out.println(argv.length);
         if ((argv.length % 2) != 1) usage();
         int port = 0; // Make the compiler shut up.
         try {

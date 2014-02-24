@@ -3,6 +3,7 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.text.*;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.*;
 
@@ -16,7 +17,11 @@ public class Protocol implements AutoCloseable {
     private Sigar sigar;
 
     private void log (String msg) {
-        System.out.println(msg); // We can change this later to use log4j.
+        SimpleDateFormat fmt =
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSz");
+        System.out.println(
+            fmt.format(new Date()).toString() + ": " + msg);
+        // We can change this later to use log4j.
     }
 
     private class Host {
@@ -63,7 +68,7 @@ public class Protocol implements AutoCloseable {
             catch (UnknownHostException e) {}
             return "{ host: (" + h +
                 ", " + port +
-                "), load: " + busyness +
+                "), load: " + String.format("%.3f", busyness) +
                 ", lastpinged: " + (now - lastpinged) +
                 "ms ago, lastresponse: " + (now - lastsuccess) +
                 "ms ago }";
@@ -82,8 +87,7 @@ public class Protocol implements AutoCloseable {
         /*
             Host host must already be in ArrayList<Host> servers.
         */
-        private synchronized boolean ping (Host host) {
-            log("pinging: " + host);
+        private boolean ping (Host host) {
             host.lastpinged = System.currentTimeMillis();
             try (
                 Socket socket = new Socket();
@@ -104,27 +108,41 @@ public class Protocol implements AutoCloseable {
                 for (int i = 0; i < numentries; ++i) {
                     Host remote = new Host();
                     remote.fromDataStream(dis, toffset);
-                    if (servers.contains(remote)) { // If already have server
-                        Host localcopy = servers.get(servers.indexOf(remote));
-                        if (localcopy.lastsuccess < remote.lastsuccess) {
-                            localcopy.lastsuccess = remote.lastsuccess;
-                            localcopy.busyness = remote.busyness;
-                        } // update local copy of server information
-                        if (localcopy.lastpinged < remote.lastpinged)
-                            localcopy.lastpinged = remote.lastpinged;
-                    } else if (!probablyDead(remote)) // Allow dead servers
-                        servers.add(remote); // to disappear.
+                    synchronized (this) {
+                        if (servers.contains(remote)) {
+                            // If already have server
+                            // update local copy of server information.
+                            Host localcopy =
+                                servers.get(servers.indexOf(remote));
+                            while (servers.contains(localcopy))
+                                servers.remove(localcopy);
+                            if (localcopy.lastsuccess < remote.lastsuccess) {
+                                localcopy.lastsuccess = remote.lastsuccess;
+                                localcopy.busyness = remote.busyness;
+                            }
+                            if (localcopy.lastpinged < remote.lastpinged)
+                                localcopy.lastpinged = remote.lastpinged;
+                            servers.add(localcopy);
+                        } else if (!probablyDead(remote)) // Allow dead servers
+                            servers.add(remote); // to disappear.
+                    }
                 }
                 host.lastsuccess = host.lastpinged;
+                log("succeeded to ping " + host);
                 return true;
             } catch (IOException e) {
+                log("failed to ping " + host);
                 return false;
             }
         }
-        private synchronized void announceServer () {
+        private void announceServer () {
             Collections.shuffle(servers, new Random()); // Randomize order.
-            for (int i = 0; i < servers.size(); ++i) {
-                Host server = servers.get(i);
+            for (int i = 0; ; ++i) {
+                Host server = null;
+                synchronized (this) {
+                    if (!(i < servers.size())) break;
+                    server = servers.get(i);
+                }
                 try (
                     Socket socket = new Socket();
                 ) {
@@ -145,27 +163,37 @@ public class Protocol implements AutoCloseable {
         private boolean probablyDead (Host host) {
             return host.lastpinged - host.lastsuccess > 10000;
         }
-        public synchronized void run () {
+        public void run () {
             try {
                 boolean succeeded = true;
                 boolean lastsucceeded = false;
                 for (;;) {
-                    wait(1000);
-                    if (servers.size() == 0) {
-                        log("No servers found yet.");
-                        continue;
-                    } else {
-                        // TODO: something involving printing the server list
+                    synchronized (this) {
+                        wait(1000);
+                        if (servers.size() == 0) {
+                            log("No servers found yet.");
+                            continue;
+                        } else {
+                            String serverlist = "server list: {\n";
+                            for (int i = 0; i < servers.size(); ++i) {
+                                serverlist += "    " + servers.get(i) + "\n";
+                            }
+                            serverlist += "}";
+                            log(serverlist);
+                        }
                     }
                     if (this.isserver)
                         announceServer();
-                    Host host = getServer(); // Already checked for empty list.
+                    Host host = getServer();
+                    if (host == null) continue;
                     if (ping(host)) {
                         lastsucceeded = true;
                     } else {
                         if (lastsucceeded && // Never remove two in a row in
                             probablyDead(host)) // case we lost our connection.
-                            servers.remove(host);
+                            synchronized (this) {
+                                servers.remove(host);
+                            }
                         lastsucceeded = false;
                     }
                 }
@@ -173,12 +201,10 @@ public class Protocol implements AutoCloseable {
         }
         public synchronized void findAll (Host remote) {
             if (servers.contains(remote)) return;
-            remote.lastpinged = 0;
-            remote.busyness = 1.0;
             servers.add(remote);
             notifyAll();
         }
-        public synchronized void handleBusynessRequest (Socket socket)
+        public void handleBusynessRequest (Socket socket)
             throws IOException {
             DataOutputStream dos =
                 new DataOutputStream(socket.getOutputStream());
@@ -187,12 +213,14 @@ public class Protocol implements AutoCloseable {
             dos.writeDouble(getBusyness());
             dis.readByte(); // Ignore this (just GETLIST for time syncing).
             long toffset = System.currentTimeMillis();
-            dos.writeInt(servers.size());
-            for (int i = 0; i < servers.size(); ++i)
-                servers.get(i).toDataStream(dos, toffset);
+            synchronized (this) {
+                dos.writeInt(servers.size());
+                for (int i = 0; i < servers.size(); ++i)
+                    servers.get(i).toDataStream(dos, toffset);
+            }
             socket.close();
         }
-        public synchronized void handleAnnounceServer (Socket socket)
+        public void handleAnnounceServer (Socket socket)
             throws IOException {
             DataInputStream ds = new DataInputStream(socket.getInputStream());
             Host host = new Host();
@@ -200,8 +228,10 @@ public class Protocol implements AutoCloseable {
             host.port = ds.readInt();
             host.busyness = ds.readDouble();
             host.lastpinged = host.lastsuccess = System.currentTimeMillis();
-            servers.remove(host);
-            servers.add(host);
+            synchronized (this) {
+                servers.remove(host);
+                servers.add(host);
+            }
             socket.close();
         }
         public synchronized Host getServer () {
@@ -254,8 +284,8 @@ public class Protocol implements AutoCloseable {
         Host host = new Host();
         host.hostname = hostname;
         host.port = port;
-        host.lastpinged = 0;
-        host.lastsuccess = System.currentTimeMillis();
+        host.lastpinged = host.lastsuccess = System.currentTimeMillis();
+        host.busyness = 1.0;
         ph.findAll(host);
     }
 
@@ -273,12 +303,15 @@ public class Protocol implements AutoCloseable {
                 new DataInputStream(socket.getInputStream());
             switch (dis.readByte()) {
                 case GETBUSYNESS:
+                    log("received ping");
                     ph.handleBusynessRequest(socket);
                     break;
                 case ANNOUNCESERVER:
+                    log("received announcement");
                     ph.handleAnnounceServer(socket);
                     break;
                 case COMMUNICATE:
+                    log("received connection");
                     return new Communicator(socket);
                 default:
                     break;

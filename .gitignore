@@ -1,7 +1,14 @@
 
-*~
+
 *.class
 *.jar
+*~
+*.sl
+*.so
+*.dylib
+*.dll
+*.lib
+
 *.jpg
 *.JPG
 *.png

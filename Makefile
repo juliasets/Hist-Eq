@@ -54,10 +54,10 @@ ProcessorAccessList.class: ProcessorAccessList.java
 	$(JCC) $(JFLAGS) ProcessorAccessList.java
 
 sigar.jar:
-	wget http://downloads.sourceforge.net/project/sigar/sigar/1.6/hyperic-sigar-1.6.4.tar.gz
+	wget -O hyperic-sigar-1.6.4.tar.gz http://downloads.sourceforge.net/project/sigar/sigar/1.6/hyperic-sigar-1.6.4.tar.gz
 	tar -zxvf ./hyperic-sigar-1.6.4.tar.gz
 	rm hyperic-sigar-1.6.4.tar.gz
-	mv hyperic-sigar-1.6.4/sigar-bin/* .
+	mv hyperic-sigar-1.6.4/sigar-bin/lib/* .
 	rm -r hyperic-sigar-1.6.4/
 
 commons-imaging.jar:
@@ -65,5 +65,5 @@ commons-imaging.jar:
 
 .PHONY: clean
 clean:
-	$(RM) *.class *.jar *~
+	$(RM) *.class *.jar *~ *.sl *.so *.dylib *.dll *.lib
 

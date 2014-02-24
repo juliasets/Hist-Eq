@@ -25,7 +25,7 @@ public class ImageCommunicator{
         comm.send(data); 
     }
     
-    public BufferedImage revcImg() throws IOException, ImageReadException
+    public BufferedImage recvImg() throws IOException, ImageReadException
     {
         byte[] data = comm.recv();
         return Imaging.getBufferedImage(data);

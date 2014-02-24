@@ -17,8 +17,7 @@ JAR = jar cmfe <(echo "Class-Path: $(JARCP)")
 default: Comrade.class
 	$(JAR) Comrade.jar Comrade *.class
 
-# also Worker.java
-Comrade.class: Comrade.java Protocol.java Communicator.java sigar.jar commons-imaging.jar
+Comrade.class: Comrade.java Protocol.java Communicator.java Worker.java sigar.jar commons-imaging.jar
 	$(JCC) $(JFLAGS) Comrade.java
 
 .PHONY: olddefault

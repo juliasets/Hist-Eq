@@ -1,5 +1,6 @@
 
 import java.io.*;
+import java.util.concurrent.*;
 
 public class Comrade {
 
@@ -12,6 +13,11 @@ public class Comrade {
     public static void main (String[] argv) {
         if ((argv.length % 2) != 1) usage();
         int port = 0; // Make the compiler shut up.
+        
+        ExecutorService executor = 
+			Executors.newFixedThreadPool(
+			    Runtime.getRuntime().availableProcessors());
+        
         try {
             port = Integer.parseInt(argv[0]);
         } catch (NumberFormatException e) { usage(); }
@@ -24,7 +30,10 @@ public class Comrade {
             }
             p.setupServer(port);
             for (;;) {
-                try ( Communicator communicator = p.serveOnce(); ) {}
+                try ( Communicator communicator = p.serveOnce(); ) {
+                    Worker worker = new Worker(communicator);
+                    executor.execute(worker);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

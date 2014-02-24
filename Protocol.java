@@ -136,7 +136,9 @@ public class Protocol implements AutoCloseable {
             }
         }
         private void announceServer () {
-            Collections.shuffle(servers, new Random()); // Randomize order.
+            synchronized (this) {
+                Collections.shuffle(servers, new Random()); // Randomize order.
+            }
             for (int i = 0; ; ++i) {
                 Host server = null;
                 synchronized (this) {

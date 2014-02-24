@@ -53,6 +53,13 @@ ImageComm.class: ImageComm.java commons-imaging.jar
 ProcessorAccessList.class: ProcessorAccessList.java
 	$(JCC) $(JFLAGS) ProcessorAccessList.java
 
+sigar.jar:
+	wget http://downloads.sourceforge.net/project/sigar/sigar/1.6/hyperic-sigar-1.6.4.tar.gz
+	tar -zxvf ./hyperic-sigar-1.6.4.tar.gz
+	rm hyperic-sigar-1.6.4.tar.gz
+	mv hyperic-sigar-1.6.4/sigar-bin/* .
+	rm -r hyperic-sigar-1.6.4/
+
 commons-imaging.jar:
 	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140107.130740-4.jar
 

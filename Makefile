@@ -66,6 +66,7 @@ sigar.jar:
 	rm hyperic-sigar-1.6.4.tar.gz
 	mv hyperic-sigar-1.6.4/sigar-bin/lib/* .
 	rm -r hyperic-sigar-1.6.4/
+	chmod +x *.dll
 
 commons-imaging.jar:
 	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140107.130740-4.jar

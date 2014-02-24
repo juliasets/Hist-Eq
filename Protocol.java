@@ -3,6 +3,8 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.*;
 
 
 public class Protocol implements AutoCloseable {
@@ -11,6 +13,7 @@ public class Protocol implements AutoCloseable {
     private static final byte GETLIST = 1;
     private static final byte ANNOUNCESERVER = 2;
     private static final byte COMMUNICATE = 3;
+    private Sigar sigar;
 
     private class Host {
         public String hostname;
@@ -84,12 +87,12 @@ public class Protocol implements AutoCloseable {
                 for (int i = 0; i < numentries; ++i) {
                     Host remote = new Host();
                     remote.fromDataStream(dis, toffset);
-                    if (servers.contains(remote)) {
+                    if (servers.contains(remote)) { // If already have server
                         Host localcopy = servers.get(servers.indexOf(remote));
                         if (localcopy.lastsuccess < remote.lastsuccess) {
                             localcopy.lastsuccess = remote.lastsuccess;
                             localcopy.busyness = remote.busyness;
-                        }
+                        } // update local copy of server information
                         if (localcopy.lastpinged < remote.lastpinged)
                             localcopy.lastpinged = remote.lastpinged;
                     } else if (!probablyDead(remote)) // Allow dead servers
@@ -207,13 +210,20 @@ public class Protocol implements AutoCloseable {
     }
 
     private double getBusyness () {
-        return 0.5; // TODO: Replace with load.
+        try {
+            double[] loads = sigar.getLoadAverage();
+            for (int i = 0; i < loads.length; i++) {
+                loads[i] = Math.min(loads[i], 1);
+            }
+            return (2*loads[0] + 3*loads[1] + loads[2])/6;
+        } catch (SigarException e) { return 0.5; }
     }
 
     private ProtocolHelper ph;
 
     public Protocol () {
         ph = new ProtocolHelper();
+        sigar = new Sigar();
     }
 
     public void addServer (String hostname, int port) {
@@ -229,7 +239,7 @@ public class Protocol implements AutoCloseable {
         ph.setupServer(port);
     }
 
-    public Communicator serveOnce (int port) throws IOException {
+    public Communicator serveOnce () throws IOException {
         Socket socket = null;
         for (;;) try {
             socket = ph.accept(); // Must not use try-with-resource
@@ -261,6 +271,9 @@ public class Protocol implements AutoCloseable {
         Socket socket = null;
         try {
             socket = new Socket(host.hostname, host.port);
+            DataOutputStream ds =
+                        new DataOutputStream(socket.getOutputStream());
+            ds.writeByte(COMMUNICATE);
             return new Communicator(socket);
         } catch (IOException e) {
             try { if (socket != null) socket.close(); }

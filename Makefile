@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 JCC := javac
 
-CLASSPATH := .:commons-imaging.jar
+CLASSPATH := .:commons-imaging.jar:sigar.jar
 
 JARCP := $(shell echo $(CLASSPATH) | sed "s/:/ /g")
 ifeq ($(shell uname -o),Cygwin)
@@ -14,7 +14,15 @@ JFLAGS = -g -cp $(CLASSPATH)
 JAR = jar cmfe <(echo "Class-Path: $(JARCP)")
 
 .PHONY: default
-default: Worker.class CreateWorkers.class KKMultiServerThread.class KKMultiServer.class KnockKnockProtocol.class KnockKnockClient.class MassClient.class ImageComm.class
+default: Comrade.class
+	$(JAR) Comrade.jar Comrade *.class
+
+# also Worker.java
+Comrade.class: Comrade.java Protocol.java Communicator.java sigar.jar commons-imaging.jar
+	$(JCC) $(JFLAGS) Comrade.java
+
+.PHONY: olddefault
+olddefault: Worker.class CreateWorkers.class KKMultiServerThread.class KKMultiServer.class KnockKnockProtocol.class KnockKnockClient.class MassClient.class ImageComm.class
 	$(JAR) MassClient.jar MassClient *.class
 	$(JAR) CreateWorkers.jar CreateWorkers *.class
 	$(JAR) KKMultiServer.jar KKMultiServer *.class

@@ -88,7 +88,6 @@ public class Protocol implements AutoCloseable {
             Host host must already be in ArrayList<Host> servers.
         */
         private boolean ping (Host host) {
-            log("pinging: " + host);
             host.lastpinged = System.currentTimeMillis();
             try (
                 Socket socket = new Socket();
@@ -115,19 +114,24 @@ public class Protocol implements AutoCloseable {
                             // update local copy of server information.
                             Host localcopy =
                                 servers.get(servers.indexOf(remote));
+                            while (servers.contains(localcopy))
+                                servers.remove(localcopy);
                             if (localcopy.lastsuccess < remote.lastsuccess) {
                                 localcopy.lastsuccess = remote.lastsuccess;
                                 localcopy.busyness = remote.busyness;
                             }
                             if (localcopy.lastpinged < remote.lastpinged)
                                 localcopy.lastpinged = remote.lastpinged;
+                            servers.add(localcopy);
                         } else if (!probablyDead(remote)) // Allow dead servers
                             servers.add(remote); // to disappear.
                     }
                 }
                 host.lastsuccess = host.lastpinged;
+                log("succeeded to ping " + host);
                 return true;
             } catch (IOException e) {
+                log("failed to ping " + host);
                 return false;
             }
         }
@@ -170,7 +174,12 @@ public class Protocol implements AutoCloseable {
                             log("No servers found yet.");
                             continue;
                         } else {
-                            // TODO: something involving printing the server list
+                            String serverlist = "server list: {\n";
+                            for (int i = 0; i < servers.size(); ++i) {
+                                serverlist += "    " + servers.get(i) + "\n";
+                            }
+                            serverlist += "}";
+                            log(serverlist);
                         }
                     }
                     if (this.isserver)

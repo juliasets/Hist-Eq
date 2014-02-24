@@ -66,8 +66,10 @@ public class Protocol implements AutoCloseable {
         private synchronized boolean ping (Host host) {
             host.lastpinged = System.currentTimeMillis();
             try (
-                Socket socket = new Socket(host.hostname, host.port);
+                Socket socket = new Socket();
             ) {
+                socket.connect(
+                    new InetSocketAddress(host.hostname, host.port), 500);
                 DataOutputStream dos =
                     new DataOutputStream(socket.getOutputStream());
                 dos.writeByte(GETBUSYNESS);
@@ -104,8 +106,11 @@ public class Protocol implements AutoCloseable {
             for (int i = 0; i < servers.size(); ++i) {
                 Host server = servers.get(i);
                 try (
-                    Socket socket = new Socket(server.hostname, server.port);
+                    Socket socket = new Socket();
                 ) {
+                    socket.connect(
+                        new InetSocketAddress(server.hostname, server.port),
+                        500);
                     DataOutputStream ds =
                         new DataOutputStream(socket.getOutputStream());
                     ds.writeByte(ANNOUNCESERVER);

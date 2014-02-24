@@ -15,6 +15,10 @@ public class Protocol implements AutoCloseable {
     private static final byte COMMUNICATE = 3;
     private Sigar sigar;
 
+    private void log (String msg) {
+        System.out.println(msg); // We can change this later to use log4j.
+    }
+
     private class Host {
         public String hostname;
         public int port;
@@ -52,6 +56,18 @@ public class Protocol implements AutoCloseable {
             lastpinged = ds.readLong() + toffset;
             lastsuccess = ds.readLong() + toffset;
         }
+        public String toString () {
+            long now = System.currentTimeMillis();
+            String h = hostname;
+            try { h = InetAddress.getByName(hostname).getCanonicalHostName(); }
+            catch (UnknownHostException e) {}
+            return "{ host: (" + h +
+                ", " + port +
+                "), load: " + busyness +
+                ", lastpinged: " + (now - lastpinged) +
+                "ms ago, lastresponse: " + (now - lastsuccess) +
+                "ms ago }";
+        }
     }
 
     private class ProtocolHelper extends Thread implements AutoCloseable {
@@ -67,6 +83,7 @@ public class Protocol implements AutoCloseable {
             Host host must already be in ArrayList<Host> servers.
         */
         private synchronized boolean ping (Host host) {
+            log("pinging: " + host);
             host.lastpinged = System.currentTimeMillis();
             try (
                 Socket socket = new Socket();
@@ -134,9 +151,15 @@ public class Protocol implements AutoCloseable {
                 boolean lastsucceeded = false;
                 for (;;) {
                     wait(1000);
+                    if (servers.size() == 0) {
+                        log("No servers found yet.");
+                        continue;
+                    } else {
+                        // TODO: something involving printing the server list
+                    }
                     if (this.isserver)
                         announceServer();
-                    Host host = getServer();
+                    Host host = getServer(); // Already checked for empty list.
                     if (ping(host)) {
                         lastsucceeded = true;
                     } else {
@@ -182,6 +205,7 @@ public class Protocol implements AutoCloseable {
             socket.close();
         }
         public synchronized Host getServer () {
+            if (servers.size() == 0) return null;
             double total = 0.0;
             for (int i = 0; i < servers.size(); ++i)
                 total += 1 - servers.get(i).busyness;
@@ -268,6 +292,7 @@ public class Protocol implements AutoCloseable {
 
     public Communicator communicate () throws IOException {
         Host host = ph.getServer();
+        if (host == null) throw new IOException();
         Socket socket = null;
         try {
             socket = new Socket(host.hostname, host.port);

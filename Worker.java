@@ -7,87 +7,31 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import org.apache.commons.imaging.*;
 
-public class Worker implements Runnable {
-	/**
- * Image histogram equalization
- *
- * Author: Bostjan Cigan (http://zerocool.is-a-geek.net)
- *
- */
- 
-    //private static BufferedImage original, equalized;
-    
-    private String hostName;
-    private int portNumber;
-    
-    public Worker(String hostName, int portNumber)
-    {
-    	this.hostName = hostName;
-		this.portNumber = portNumber;
-    }
- 
-    public void run() {
+public class Worker implements Runnable{
 
-        while (true)
-        {
-	        try (
-	                Socket kkSocket = new Socket(hostName, portNumber);
-	            ) {
-	            BufferedImage original;
-	            BufferedImage equalized;
-	            System.out.println("Processor connected");
-	            ImageComm ic = new ImageComm(kkSocket);
-	            String message;
-	            
-	            ic.sendmsg("processor");
-				System.out.println("Requested job");
-	            //get job
-	            message = ic.recvmsg();
-	            while (!message.equals("Job"))
-	            {
-	            	message = ic.recvmsg();
-	            }
-	            System.out.println("Job available");
-	            ic.sendmsg("Ready");
-	            original = ic.recvimg();            
-				System.out.println("Job received");
-	            //equalize received job
-	            equalized = histogramEqualization(original);
-	            System.out.println("Job finished");
-	            //send processed job back to server and close
-	            ic.sendmsg("Ready");
-	            message = ic.recvmsg();
-	            if (!message.equals("Confirm"))
-	            {
-	            	//problem with protocol
-	            	System.out.println("Protocol problem f");
-	            }
-	            System.out.println("Sending finished job");
-	            ic.sendimg(equalized);//send image
-	            message = ic.recvmsg();
-	            System.out.println("Sent finished job");
-	            if (!message.equals("Close"))
-	            {
-	            	//problem with protocol
-	            	System.out.println("Protocol problem g");
-	            }
-	            kkSocket.close();	
-	            System.out.println("Exiting");            
-	        } catch (IOException e) {
-		        System.err.println("Couldn't get I/O for the connection to " +
-		            hostName);
-		        e.printStackTrace();
-		        System.exit(1);
-		    } catch (ImageReadException e) {
-		    	System.err.println("ImageReadException");
-		    	System.exit(1);
-		    } catch (ImageWriteException e) {
-		    	System.err.println("ImageWriteException");
-		    	System.exit(1);
-		    }
-	    } 
+    private Communicator comm;
+    
+    public Worker (Communicator comm){
+        this.comm = comm;
     }
-  
+    
+    public void run(){
+        try {
+        ImageCommunicator imComm = new ImageCommunicator(comm);
+        BufferedImage original;
+        BufferedImage equalized;
+        
+        original = imComm.recvImg();
+        equalized = histogramEqualization(original);
+        
+        imComm.sendImg(equalized);
+        
+        comm.close();
+        } catch (IOException e) {}
+        catch (ImageReadException e) {}
+        catch (ImageWriteException e) {}
+    }
+
     private static BufferedImage histogramEqualization(BufferedImage original) {
  
         int red;

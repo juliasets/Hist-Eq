@@ -64,5 +64,5 @@ cleanish:
 
 .PHONY: clean
 clean:
-	$(RM) *.class *.jar *~ classpath.txt
+	$(RM) *.class *.jar *~ classpath.txt *.sl *.so *.dylib *.dll *.lib
 

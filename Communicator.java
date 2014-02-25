@@ -4,7 +4,7 @@ import java.net.*;
 import java.io.*;
 
 
-public class Communicator {
+public class Communicator implements AutoCloseable{
 
     private DataOutputStream dos;
     private DataInputStream dis;

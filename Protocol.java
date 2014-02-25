@@ -6,9 +6,7 @@ import java.util.*;
 import java.text.*;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.*;
-import java.util.Date;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
 
 public class Protocol implements AutoCloseable {
 
@@ -18,14 +16,12 @@ public class Protocol implements AutoCloseable {
     private static final byte COMMUNICATE = 3;
     private Sigar sigar;
 
-    private static Log LOG = LogFactory.getLog(Protocol.class);
-
     private void log (String msg) {
         SimpleDateFormat fmt =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSz");
-        LOG.info(
+        System.out.println(
             fmt.format(new Date()).toString() + ": " + msg);
-        // officially changed to log4j
+        // We can change this later to use log4j.
     }
 
     private class Host {
@@ -202,7 +198,6 @@ public class Protocol implements AutoCloseable {
                             probablyDead(host)) // case we lost our connection.
                             synchronized (this) {
                                 servers.remove(host);
-				log("Server removed from server list." ); // can we get the port for this?
                             }
                         lastsucceeded = false;
                     }

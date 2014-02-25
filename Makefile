@@ -73,7 +73,7 @@ sigar.jar:
 	chmod +x *.dll
 
 commons-imaging.jar:
-	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140107.130740-4.jar
+	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140224.222237-6.jar
 
 .PHONY: clean
 clean:

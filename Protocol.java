@@ -266,7 +266,9 @@ public class Protocol implements AutoCloseable {
                     serversocket.close();
                 } catch (IOException e) {}
             closed = true;
-            notifyAll();
+            synchronized (this) {
+                notifyAll();
+            }
         }
     }
 
@@ -340,8 +342,6 @@ public class Protocol implements AutoCloseable {
             DataOutputStream ds =
                         new DataOutputStream(socket.getOutputStream());
             ds.writeByte(COMMUNICATE);
-            log("Wrote command");
-            log("closed " + socket.isClosed());
             return new Communicator(socket);
         } catch (IOException e) {
             try { if (socket != null) socket.close(); }

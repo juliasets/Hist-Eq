@@ -56,6 +56,7 @@ public class Commissar {
                     directory + "/" + "processed-" + inputFilenames.get(i));
                 Imaging.writeImage(result, f, ImageFormats.PNG, null);
             }
+            p.close();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ImageReadException e) {

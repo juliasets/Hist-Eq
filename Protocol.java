@@ -78,6 +78,7 @@ public class Protocol implements AutoCloseable {
     private class ProtocolHelper extends Thread implements AutoCloseable {
         private ArrayList<Host> servers;
         private boolean isserver = false;
+        private boolean closed = false;
         private ServerSocket serversocket;
         private int port;
         public ProtocolHelper () {
@@ -184,6 +185,8 @@ public class Protocol implements AutoCloseable {
                             log(serverlist);
                         }
                     }
+                    if (this.closed)
+                    	break;
                     if (this.isserver)
                         announceServer();
                     Host host = getServer();
@@ -262,6 +265,7 @@ public class Protocol implements AutoCloseable {
                 try {
                     serversocket.close();
                 } catch (IOException e) {}
+            closed = true;
         }
     }
 
@@ -327,6 +331,7 @@ public class Protocol implements AutoCloseable {
 
     public Communicator communicate () throws IOException {
         Host host = ph.getServer();
+        log("communicating with " + host);
         if (host == null) throw new IOException();
         Socket socket = null;
         try {
@@ -334,6 +339,8 @@ public class Protocol implements AutoCloseable {
             DataOutputStream ds =
                         new DataOutputStream(socket.getOutputStream());
             ds.writeByte(COMMUNICATE);
+            log("Wrote command");
+            log("closed " + socket.isClosed());
             return new Communicator(socket);
         } catch (IOException e) {
             try { if (socket != null) socket.close(); }

@@ -14,11 +14,14 @@ JFLAGS = -g -cp $(CLASSPATH)
 JAR = jar cmfe <(echo "Class-Path: $(JARCP)")
 
 .PHONY: default
-default: Comrade.class
+default: Comrade.class Commissar.class
 	$(JAR) Comrade.jar Comrade *.class
 
-Comrade.class: Comrade.java Protocol.java Communicator.java Worker.java sigar.jar commons-imaging.jar
+Comrade.class: Comrade.java Protocol.java Communicator.java ImageCommunicator.java Worker.java sigar.jar commons-imaging.jar
 	$(JCC) $(JFLAGS) Comrade.java
+	
+Commissar.class: Commissar.java Protocol.java Communicator.java ImageCommunicator.java commons-imaging.jar sigar.jar
+	$(JCC) $(JFLAGS) Commissar.java
 
 .PHONY: olddefault
 olddefault: Worker.class CreateWorkers.class KKMultiServerThread.class KKMultiServer.class KnockKnockProtocol.class KnockKnockClient.class MassClient.class ImageComm.class

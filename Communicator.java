@@ -4,7 +4,7 @@ import java.net.*;
 import java.io.*;
 
 
-public class Communicator implements AutoCloseable {
+public class Communicator {
 
     private DataOutputStream dos;
     private DataInputStream dis;
@@ -15,6 +15,8 @@ public class Communicator implements AutoCloseable {
         dis = new DataInputStream(socket.getInputStream());
         this.socket = socket;
     }
+    
+    
 
     public void send (byte[] b) throws IOException {
         dos.writeInt(b.length);
@@ -29,6 +31,7 @@ public class Communicator implements AutoCloseable {
     }
 
     public void close () throws IOException {
+        System.out.println("Closing imComm");
         socket.close();
     }
 

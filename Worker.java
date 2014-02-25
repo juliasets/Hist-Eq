@@ -23,13 +23,20 @@ public class Worker implements Runnable{
         
         original = imComm.recvImg();
         equalized = histogramEqualization(original);
-        
         imComm.sendImg(equalized);
-        
         comm.close();
-        } catch (IOException e) {}
-        catch (ImageReadException e) {}
-        catch (ImageWriteException e) {}
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        } catch (ImageReadException e) {
+            System.err.println("ImageReadException");
+            e.printStackTrace();
+            System.exit(1);
+        } catch (ImageWriteException e) {
+            System.err.println("ImageWriteException");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private static BufferedImage histogramEqualization(BufferedImage original) {

@@ -30,9 +30,17 @@ public class Comrade {
             }
             p.setupServer(port);
             for (;;) {
-                try ( Communicator communicator = p.serveOnce(); ) {
+                Communicator communicator = null;
+                try {
+                    communicator = p.serveOnce();
                     Worker worker = new Worker(communicator);
                     executor.execute(worker);
+                } catch (IOException e) {
+                    if (communicator != null)
+                    {
+                        try { communicator.close(); } 
+                        catch (Exception e2) {}
+                    }
                 }
             }
         } catch (IOException e) {

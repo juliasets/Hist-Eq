@@ -17,11 +17,11 @@ comrades. With such a protocol, each comrade is only contacted an average of
 twice in each period, and status information (including news of a new or dead
 node) propagates quickly to all nodes in a small number of periods.
 
-The clients ("commisars") also know about every comrade and the status of
-each. Each commisar periodically chooses one comrade randomly and asks it for
-the status of all comrades. When the commisar wants to assign a job to the
+The clients ("commissars") also know about every comrade and the status of
+each. Each commissar periodically chooses one comrade randomly and asks it for
+the status of all comrades. When the commissar wants to assign a job to the
 computing platform, it chooses a comrade using a random selection process
 weighted by the relative workloads of the different comrades. This way
 load is distributed fairly between the different comrades. Meanwhile, the
-commisar waits for its work to be done for it.
+commissar waits for its work to be done for it.
 

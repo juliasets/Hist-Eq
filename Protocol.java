@@ -266,6 +266,7 @@ public class Protocol implements AutoCloseable {
                     serversocket.close();
                 } catch (IOException e) {}
             closed = true;
+            notifyAll();
         }
     }
 

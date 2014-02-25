@@ -6,7 +6,8 @@ import java.util.*;
 import java.text.*;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.*;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Protocol implements AutoCloseable {
 
@@ -16,11 +17,12 @@ public class Protocol implements AutoCloseable {
     private static final byte COMMUNICATE = 3;
     private Sigar sigar;
 
+    private static Logger logger = LogManager.getLogger("Protocol");
+
     private void log (String msg) {
         SimpleDateFormat fmt =
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSz");
-        System.out.println(
-            fmt.format(new Date()).toString() + ": " + msg);
+	logger.info(fmt.format(new Date()).toString() + ": " + msg);
         // We can change this later to use log4j.
     }
 

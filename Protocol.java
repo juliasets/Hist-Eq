@@ -17,13 +17,10 @@ public class Protocol implements AutoCloseable {
     private static final byte COMMUNICATE = 3;
     private Sigar sigar;
 
-    private static Logger logger = LogManager.getLogger("Protocol");
+    static final Logger logger = LogManager.getLogger(Protocol.class.getName());
 
     private void log (String msg) {
-        SimpleDateFormat fmt =
-            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSz");
-	logger.info(fmt.format(new Date()).toString() + ": " + msg);
-        // We can change this later to use log4j.
+	logger.info(msg);
     }
 
     private class Host {

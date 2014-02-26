@@ -78,7 +78,7 @@ public class Protocol implements AutoCloseable {
         private ArrayList<Host> servers;
         private boolean isserver = false;
         private boolean closed = false;
-        private ServerSocket serversocket;
+        private ServerSocket serversocket = null;
         private int port;
         public ProtocolHelper () {
             servers = new ArrayList<Host>();
@@ -172,6 +172,8 @@ public class Protocol implements AutoCloseable {
                 for (;;) {
                     synchronized (this) {
                         wait(1000);
+                        if (this.closed)
+                        	return;
                         if (servers.size() == 0) {
                             log("No servers found yet.");
                             continue;
@@ -184,8 +186,6 @@ public class Protocol implements AutoCloseable {
                             log(serverlist);
                         }
                     }
-                    if (this.closed)
-                    	break;
                     if (this.isserver)
                         announceServer();
                     Host host = getServer();
@@ -253,14 +253,16 @@ public class Protocol implements AutoCloseable {
         }
         public void setupServer (int port) throws IOException {
             this.port = port;
-            serversocket = new ServerSocket(port);
+            try {
+                serversocket = new ServerSocket(port);
+            } catch (BindException e) { throw new IOException(); }
             this.isserver = true;
         }
         public Socket accept () throws IOException {
             return serversocket.accept();
         }
         public void close () {
-            if (this.isserver)
+            if (serversocket != null)
                 try {
                     serversocket.close();
                 } catch (IOException e) {}

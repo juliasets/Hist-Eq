@@ -9,6 +9,7 @@ CLASSPATH := .:commons-imaging.jar:sigar.jar:log4j.jar:log4j-core.jar:log4j-api.
 JARCP := $(shell echo $(CLASSPATH) | sed "s/:/ /g")
 ifeq ($(shell uname -o),Cygwin)
         CLASSPATH := "$(shell cygpath -wp $(CLASSPATH))"
+        FINDMAVEN := python ./find_maven.py
 endif
 
 JFLAGS = -g -cp $(CLASSPATH)

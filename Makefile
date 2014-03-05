@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 
+FINDMAVEN := ./find_maven.py
+
 JCC := javac
 
 CLASSPATH := .:commons-imaging.jar:sigar.jar:log4j.jar:log4j-core.jar:log4j-api.jar
@@ -40,13 +42,13 @@ sigar.jar:
 	chmod +x *.dll
 
 commons-imaging.jar:
-	wget -O commons-imaging.jar http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/1.0-SNAPSHOT/commons-imaging-1.0-20140224.222237-6.jar
+	$(FINDMAVEN) http://repository.apache.org/content/groups/snapshots/org/apache/commons/commons-imaging/ commons-imaging.jar
 
 log4j-core.jar:
-	wget -O log4j-core.jar http://repository.apache.org/content/groups/snapshots/org/apache/logging/log4j/log4j-core/2.0-rc2-SNAPSHOT/log4j-core-2.0-rc2-20140304.225615-27.jar
+	$(FINDMAVEN) http://repository.apache.org/content/groups/snapshots/org/apache/logging/log4j/log4j-core/ log4j-core.jar
 
 log4j-api.jar:
-	wget -O log4j-api.jar http://repository.apache.org/content/groups/snapshots/org/apache/logging/log4j/log4j-api/2.0-rc2-SNAPSHOT/log4j-api-2.0-rc2-20140304.225614-27.jar
+	$(FINDMAVEN) http://repository.apache.org/content/groups/snapshots/org/apache/logging/log4j/log4j-api/ log4j-api.jar
 
 .PHONY: cleanish
 cleanish:

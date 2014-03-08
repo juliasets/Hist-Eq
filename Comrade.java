@@ -33,7 +33,7 @@ public class Comrade {
                 Communicator communicator = null;
                 try {
                     communicator = p.serveOnce();
-                    Worker worker = new Worker(communicator);
+                    EdgeWorker worker = new EdgeWorker(communicator);
                     executor.execute(worker);
                 } catch (IOException e) {
                     if (communicator != null)

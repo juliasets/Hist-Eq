@@ -31,7 +31,6 @@ public class Communicator implements AutoCloseable{
     }
 
     public void close () throws IOException {
-        System.out.println("Closing imComm");
         socket.close();
     }
 

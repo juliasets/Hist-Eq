@@ -25,7 +25,7 @@ Comrade.jar: Comrade.class classpath.txt
 Commissar.jar: Commissar.class classpath.txt
 	$(JAR) Commissar.jar Commissar *.class
 
-Comrade.class: Comrade.java Protocol.java Communicator.java ImageCommunicator.java Worker.java commons-imaging.jar sigar.jar log4j-core.jar log4j-api.jar
+Comrade.class: Comrade.java Protocol.java Communicator.java ImageCommunicator.java EdgeWorker.java commons-imaging.jar sigar.jar log4j-core.jar log4j-api.jar
 	$(JCC) $(JFLAGS) Comrade.java
 
 Commissar.class: Commissar.java Protocol.java Communicator.java ImageCommunicator.java commons-imaging.jar sigar.jar log4j-core.jar log4j-api.jar

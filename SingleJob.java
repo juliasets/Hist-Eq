@@ -38,8 +38,6 @@ public class SingleJob implements Runnable
             
             BufferedImage received = imComm.recvImg();
             
-            imComm.close();
-            
             synchronized(toInsert)
             {
                 toInsert.drawImage( received.getSubimage(0, interiorOffset, 

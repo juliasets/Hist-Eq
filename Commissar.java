@@ -29,13 +29,15 @@ public class Commissar {
         int BUFFER = 1;
         
         String directory = argv[0];
-        String outdirectory = argv[1];
 		
 		File dir = new File(directory);
         ArrayList<String> names = 
             new ArrayList<String>(Arrays.asList(dir.list()));
         ArrayList<String> inputFilenames = new ArrayList<String>();
         
+        String outdirectory = argv[1];
+        new File(outdirectory).mkdir();
+		
         for (int i = 0; i < names.size(); i++)
         {
         	if (names.get(i).endsWith(".png") ||

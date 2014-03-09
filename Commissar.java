@@ -17,18 +17,19 @@ public class Commissar {
 
     private static void usage () {
         System.out.println(
-            "Usage: Commissar directory host port " + 
+            "Usage: Commissar directory outputdir host port " + 
             "[host port [host port [...]]]");
         System.exit(1);
     }
 
     public static void main(String[] argv){
-        if ((argv.length < 3) || ((argv.length%2) != 1)) usage();
+        if ((argv.length < 4) || ((argv.length%2) != 0)) usage();
         
         int MAX_HEIGHT = 100;
         int BUFFER = 1;
         
         String directory = argv[0];
+        String outdirectory = argv[1];
 		
 		File dir = new File(directory);
         ArrayList<String> names = 
@@ -52,7 +53,7 @@ public class Commissar {
 			    Executors.newFixedThreadPool(
 			    Runtime.getRuntime().availableProcessors());
             ArrayList<BufferedImage> outIms = new ArrayList<BufferedImage>();
-            for (int i = 1; i < argv.length; i += 2) 
+            for (int i = 2; i < argv.length; i += 2) 
             {
                 try {
                     p.addServer(argv[i], Integer.parseInt(argv[i + 1]));
@@ -125,7 +126,7 @@ public class Commissar {
             for (int i = 0; i < inputFilenames.size(); i++) 
             {
                 File f = new File(
-                    directory + "/" + "processed-" + inputFilenames.get(i));
+                    outdirectory + "/" + "processed-" + inputFilenames.get(i));
                 Imaging.writeImage(outIms.get(i), f, ImageFormats.PNG, null);
             }
             

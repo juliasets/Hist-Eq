@@ -2,7 +2,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 import org.apache.commons.imaging.*;
-import java.util.*;
+import java.util.Date;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -12,6 +12,8 @@ import java.awt.*;
 import java.util.concurrent.*;
 
 import org.apache.commons.imaging.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Commissar {
 
@@ -21,7 +23,13 @@ public class Commissar {
             "[host port [host port [...]]]");
         System.exit(1);
     }
+    
+    static final Logger logger = LogManager.getLogger(Commissar.class.getName());
 
+    private static void log (String msg) {
+    	logger.info(msg);
+    }
+    
     public static void main(String[] argv){
         if ((argv.length < 4) || ((argv.length%2) != 0)) usage();
         
@@ -63,6 +71,8 @@ public class Commissar {
             }
             
             System.out.println("sending images");
+            Date date = new Date();
+            long starttime = date.getTime();
             for (int i = 0; i < inputFilenames.size(); i++) 
             {
                 File f = new File(directory + "/" + inputFilenames.get(i));
@@ -124,6 +134,10 @@ public class Commissar {
             
             executor.shutdown();
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+            
+            Date date2 = new Date();
+            String runtime = String.valueOf(date2.getTime() - starttime);
+            log(runtime);
             
             for (int i = 0; i < inputFilenames.size(); i++) 
             {

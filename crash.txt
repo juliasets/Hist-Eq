@@ -1,0 +1,14 @@
+splitting image 21
+splitting image 22
+splitting image 23
+Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+        at java.awt.image.DataBufferInt.<init>(DataBufferInt.java:75)
+        at java.awt.image.Raster.createPackedRaster(Raster.java:467)
+        at java.awt.image.DirectColorModel.createCompatibleWritableRaster(DirectColorModel.java:1032)
+        at java.awt.image.BufferedImage.<init>(BufferedImage.java:331)
+        at org.apache.commons.imaging.common.SimpleBufferedImageFactory.getColorBufferedImage(SimpleBufferedImageFactory.java:28)
+        at org.apache.commons.imaging.formats.png.PngImageParser.getBufferedImage(PngImageParser.java:610)
+        at org.apache.commons.imaging.Imaging.getBufferedImage(Imaging.java:1378)
+        at org.apache.commons.imaging.Imaging.getBufferedImage(Imaging.java:1341)
+        at Commissar.main(Commissar.java:79)
+

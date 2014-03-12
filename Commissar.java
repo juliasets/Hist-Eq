@@ -62,7 +62,6 @@ public class Commissar {
             ExecutorService executor = 
 			    Executors.newFixedThreadPool(
 			    Runtime.getRuntime().availableProcessors());
-            ArrayList<BufferedImage> outIms = new ArrayList<BufferedImage>();
             for (int i = 2; i < argv.length; i += 2) 
             {
                 try {
@@ -79,9 +78,9 @@ public class Commissar {
                 BufferedImage im = Imaging.getBufferedImage(f);
                 int h = im.getHeight();
                 int w = im.getWidth();
-                BufferedImage result = new BufferedImage( w, h, im.getType());
-                Graphics g = result.getGraphics();
-                outIms.add(result);
+                File outf = new File(
+                    outdirectory + "/" + "processed-" + inputFilenames.get(i));
+                Imaging.writeImage(im, outf, ImageFormats.PNG, null);
                 System.out.println("splitting image " + i);
                 if (h > MAX_HEIGHT)
                 {
@@ -90,7 +89,7 @@ public class Commissar {
                     {
                         ImageCommunicator imgComm = 
                             new ImageCommunicator(p.communicate());
-                        SingleJob job = new SingleJob(imgComm, im, g, h, 0, 0);
+                        SingleJob job = new SingleJob(imgComm, im, outf, h, 0, 0);
                         executor.execute(job);
                     }
                     else
@@ -101,7 +100,7 @@ public class Commissar {
                             new ImageCommunicator(p.communicate());
                         SingleJob job = new SingleJob(imgComm, 
                             im.getSubimage(0, 0, w, smH + BUFFER), 
-                            g, smH, 0, 0);
+                            outf, smH, 0, 0);
                         executor.execute(job);
                         
                         for (int j = 1; j < num - 1; j++)
@@ -110,7 +109,7 @@ public class Commissar {
                             job = new SingleJob(imgComm, 
                                 im.getSubimage(0, j*smH - BUFFER, 
                                     w, smH + 2*BUFFER), 
-                                g, smH, j*smH + BUFFER, BUFFER);
+                                outf, smH, j*smH + BUFFER, BUFFER);
                             
                             executor.execute(job);
                         }
@@ -118,7 +117,7 @@ public class Commissar {
                         job = new SingleJob(imgComm, 
                             im.getSubimage(0, (num - 1)*smH  - BUFFER, 
                                 w, h - (num - 1)*smH + BUFFER), 
-                            g, h - (num - 1)*smH, (num - 1)*smH, BUFFER);
+                            outf, h - (num - 1)*smH, (num - 1)*smH, BUFFER);
                         
                         executor.execute(job);
                     }
@@ -127,7 +126,7 @@ public class Commissar {
                 {
                     ImageCommunicator imgComm = 
                         new ImageCommunicator(p.communicate());
-                    SingleJob job = new SingleJob(imgComm, im, g, h, 0, 0);
+                    SingleJob job = new SingleJob(imgComm, im, outf, h, 0, 0);
                     executor.execute(job);
                 }
             }
@@ -138,13 +137,6 @@ public class Commissar {
             Date date2 = new Date();
             String runtime = String.valueOf(date2.getTime() - starttime);
             log(runtime);
-            
-            for (int i = 0; i < inputFilenames.size(); i++) 
-            {
-                File f = new File(
-                    outdirectory + "/" + "processed-" + inputFilenames.get(i));
-                Imaging.writeImage(outIms.get(i), f, ImageFormats.PNG, null);
-            }
             
             p.close();
         } catch (IOException e) {

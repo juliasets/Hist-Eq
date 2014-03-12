@@ -13,13 +13,13 @@ import java.awt.*;
 public class SingleJob implements Runnable
 {
     private BufferedImage toSend;
-    private Graphics toInsert;
+    private File toInsert;
     private int offset;
     private int interiorOffset;
     private int height;
     private ImageCommunicator imComm;
     
-    SingleJob( ImageCommunicator imComm, BufferedImage toSend, Graphics toInsert, 
+    SingleJob( ImageCommunicator imComm, BufferedImage toSend, File toInsert, 
         int height, int offset, int interiorOffset)
     {
         this.toSend = toSend;
@@ -40,8 +40,11 @@ public class SingleJob implements Runnable
             
             synchronized(toInsert)
             {
-                toInsert.drawImage( received.getSubimage(0, interiorOffset, 
+                BufferedImage im = Imaging.getBufferedImage(toInsert);
+                Graphics g = im.getGraphics();
+                g.drawImage( received.getSubimage(0, interiorOffset, 
                     received.getWidth(), height), 0, offset, null );
+                Imaging.writeImage(im, toInsert, ImageFormats.PNG, null);
             }
         } catch (IOException e) {
             e.printStackTrace();

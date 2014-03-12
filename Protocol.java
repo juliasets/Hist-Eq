@@ -338,16 +338,23 @@ public class Protocol implements AutoCloseable {
         log("communicating with " + host);
         if (host == null) throw new IOException();
         Socket socket = null;
-        try {
-            socket = new Socket(host.hostname, host.port);
-            DataOutputStream ds =
-                        new DataOutputStream(socket.getOutputStream());
-            ds.writeByte(COMMUNICATE);
-            return new Communicator(socket);
-        } catch (IOException e) {
-            try { if (socket != null) socket.close(); }
-            catch (IOException e2) {}
-            throw e;
+        while (true)
+        {
+            try {
+                socket = new Socket(host.hostname, host.port);
+                DataOutputStream ds =
+                            new DataOutputStream(socket.getOutputStream());
+                ds.writeByte(COMMUNICATE);
+                return new Communicator(socket);
+            } catch (ConnectException e) {
+                log("connection refused by " + host);
+                host = ph.getServer();
+                log("communicating with " + host);
+            } catch (IOException e) {
+                try { if (socket != null) socket.close(); }
+                catch (IOException e2) {}
+                throw e;
+            }
         }
     }
 

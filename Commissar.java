@@ -33,8 +33,8 @@ public class Commissar {
     public static void main(String[] argv){
         if ((argv.length < 4) || ((argv.length%2) != 0)) usage();
         
-        int MAX_HEIGHT = 100;
-        int BUFFER = 1;
+        int MAX_HEIGHT = 300;
+        int BUFFER = 2;
         
         String directory = argv[0];
 		
@@ -74,6 +74,7 @@ public class Commissar {
             long starttime = date.getTime();
             for (int i = 0; i < inputFilenames.size(); i++) 
             {
+                System.out.println("splitting image " + i);
                 File f = new File(directory + "/" + inputFilenames.get(i));
                 BufferedImage im = Imaging.getBufferedImage(f);
                 int h = im.getHeight();
@@ -81,7 +82,6 @@ public class Commissar {
                 File outf = new File(
                     outdirectory + "/" + "processed-" + inputFilenames.get(i));
                 Imaging.writeImage(im, outf, ImageFormats.PNG, null);
-                System.out.println("splitting image " + i);
                 if (h > MAX_HEIGHT)
                 {
                     int num = Math.round(h/MAX_HEIGHT);
@@ -109,7 +109,7 @@ public class Commissar {
                             job = new SingleJob(imgComm, 
                                 im.getSubimage(0, j*smH - BUFFER, 
                                     w, smH + 2*BUFFER), 
-                                outf, smH, j*smH + BUFFER, BUFFER);
+                                outf, smH, j*smH, BUFFER);
                             
                             executor.execute(job);
                         }
@@ -129,6 +129,7 @@ public class Commissar {
                     SingleJob job = new SingleJob(imgComm, im, outf, h, 0, 0);
                     executor.execute(job);
                 }
+                System.out.println("sent image " + i);
             }
             
             executor.shutdown();
